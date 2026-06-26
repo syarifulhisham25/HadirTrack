@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F6FF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create Session"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="#2D2363"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/courseInfoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Course info"
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="24dp" />
+
+        <EditText
+            android:id="@+id/sessionTitleInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Session Title e.g. Week 5 Lecture"
+            android:padding="14dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/locationNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Location Name e.g. Faculty of Computer and Mathematical Sciences"
+            android:padding="14dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/roomNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Room Name e.g. BK15"
+            android:padding="14dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/latitudeInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Latitude e.g. 3.0738"
+            android:inputType="numberDecimal|numberSigned"
+            android:padding="14dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/longitudeInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Longitude e.g. 101.5183"
+            android:inputType="numberDecimal|numberSigned"
+            android:padding="14dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/radiusInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Radius Meter e.g. 50"
+            android:inputType="number"
+            android:padding="14dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/startDateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Date: Not selected"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/selectStartDateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Start Date"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/startTimeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Time: Not selected"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/selectStartTimeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Start Time"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/endDateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="End Date: Not selected"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/selectEndDateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select End Date"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/endTimeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="End Time: Not selected"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/selectEndTimeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select End Time"
+            android:layout_marginBottom="24dp" />
+
+        <Button
+            android:id="@+id/saveSessionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Session"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Back"
+            android:padding="12dp" />
+
+    </LinearLayout>
+</ScrollView>

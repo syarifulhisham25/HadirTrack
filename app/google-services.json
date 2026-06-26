@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "701793679238",
+    "project_id": "hadirtrack-421e1",
+    "storage_bucket": "hadirtrack-421e1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:701793679238:android:e22b8c8532742e03ea1e07",
+        "android_client_info": {
+          "package_name": "com.example.hadirtrack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1wwvU8qOhgKQghAzYx-_ldFnz-xFC2mw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
