@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class StudentDashboardActivity extends AppCompatActivity {
 
     ListView studentSessionListView;
-    Button logoutButton;
+    Button profileButton, logoutButton;
 
     FirebaseAuth auth;
     FirebaseFirestore db;
@@ -38,6 +38,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         studentSessionListView = findViewById(R.id.studentSessionListView);
+        profileButton = findViewById(R.id.profileButton);
         logoutButton = findViewById(R.id.logoutButton);
 
         adapter = new ArrayAdapter<>(
@@ -56,6 +57,11 @@ public class StudentDashboardActivity extends AppCompatActivity {
             Intent intent = new Intent(StudentDashboardActivity.this, StudentSessionDetailActivity.class);
             intent.putExtra("sessionId", sessionIdList.get(position));
             intent.putExtra("courseId", courseIdList.get(position));
+            startActivity(intent);
+        });
+
+        profileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(StudentDashboardActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
 

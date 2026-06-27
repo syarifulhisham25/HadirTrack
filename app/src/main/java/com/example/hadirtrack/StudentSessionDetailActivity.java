@@ -1,12 +1,21 @@
 package com.example.hadirtrack;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -16,6 +25,7 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
     Button checkInButton, backButton;
 
     FirebaseFirestore db;
+    FusedLocationProviderClient fusedLocationClient;
 
     String sessionId, courseId;
 
@@ -23,12 +33,15 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
     double classLongitude = 0.0;
     long radiusMeter = 50;
 
+    ActivityResultLauncher<String> locationPermissionLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_session_detail);
 
         db = FirebaseFirestore.getInstance();
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         courseTitleText = findViewById(R.id.courseTitleText);
         sessionInfoText = findViewById(R.id.sessionInfoText);
@@ -38,13 +51,22 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
         sessionId = getIntent().getStringExtra("sessionId");
         courseId = getIntent().getStringExtra("courseId");
 
+        locationPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        getCurrentLocationAndValidate();
+                    } else {
+                        Toast.makeText(this, "Location permission is required for attendance", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
         loadSessionDetails();
 
         backButton.setOnClickListener(v -> finish());
 
-        checkInButton.setOnClickListener(v -> {
-            Toast.makeText(this, "Next: GPS validation + selfie camera", Toast.LENGTH_SHORT).show();
-        });
+        checkInButton.setOnClickListener(v -> checkLocationPermission());
     }
 
     private void loadSessionDetails() {
@@ -93,8 +115,88 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
                 + "\nRoom: " + roomName
                 + "\nStart: " + startTime
                 + "\nEnd: " + endTime
-                + "\nAllowed Radius: " + radiusMeter + " meters";
+                + "\nAllowed Radius: " + radiusMeter + " meters"
+                + "\n\nClass GPS: " + classLatitude + ", " + classLongitude;
 
         sessionInfoText.setText(info);
+    }
+
+    private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED) {
+
+            getCurrentLocationAndValidate();
+
+        } else {
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+    }
+
+    private void getCurrentLocationAndValidate() {
+        checkInButton.setEnabled(false);
+        checkInButton.setText("Checking location...");
+
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED) {
+            checkInButton.setEnabled(true);
+            checkInButton.setText("Check In");
+            return;
+        }
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    checkInButton.setEnabled(true);
+                    checkInButton.setText("Check In");
+
+                    if (location == null) {
+                        Toast.makeText(this, "Unable to get location. Please turn on GPS and try again.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    validateDistance(location);
+                })
+                .addOnFailureListener(e -> {
+                    checkInButton.setEnabled(true);
+                    checkInButton.setText("Check In");
+                    Toast.makeText(this, "Failed to get location: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void validateDistance(Location studentLocation) {
+        float[] results = new float[1];
+
+        Location.distanceBetween(
+                studentLocation.getLatitude(),
+                studentLocation.getLongitude(),
+                classLatitude,
+                classLongitude,
+                results
+        );
+
+        float distanceInMeter = results[0];
+
+        if (distanceInMeter <= radiusMeter) {
+            Intent intent = new Intent(StudentSessionDetailActivity.this, SelfieActivity.class);
+            intent.putExtra("sessionId", sessionId);
+            intent.putExtra("courseId", courseId);
+            intent.putExtra("studentLatitude", studentLocation.getLatitude());
+            intent.putExtra("studentLongitude", studentLocation.getLongitude());
+            intent.putExtra("distanceFromClass", distanceInMeter);
+            startActivity(intent);
+
+
+            // Next step nanti: open camera activity
+
+        } else {
+            Toast.makeText(
+                    this,
+                    "You are too far from class. Distance: " + Math.round(distanceInMeter) + "m",
+                    Toast.LENGTH_LONG
+            ).show();
+        }
     }
 }

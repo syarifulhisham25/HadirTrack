@@ -22,6 +22,7 @@ import java.util.Map;
 public class CreateSessionActivity extends AppCompatActivity {
 
     TextView courseInfoText, startDateText, startTimeText, endDateText, endTimeText;
+    TextView startDateTimeText, endDateTimeText;
 
     EditText sessionTitleInput, locationNameInput, roomNameInput,
             latitudeInput, longitudeInput, radiusInput;
@@ -34,6 +35,8 @@ public class CreateSessionActivity extends AppCompatActivity {
     FirebaseFirestore db;
 
     String courseId, courseCode, courseName;
+    String sessionId = "";
+    boolean isEditMode = false;
 
     String startDate = "";
     String startTimeOnly = "";
@@ -57,6 +60,9 @@ public class CreateSessionActivity extends AppCompatActivity {
         longitudeInput = findViewById(R.id.longitudeInput);
         radiusInput = findViewById(R.id.radiusInput);
 
+        startDateTimeText = findViewById(R.id.startDateTimeText);
+        endDateTimeText = findViewById(R.id.endDateTimeText);
+
         startDateText = findViewById(R.id.startDateText);
         startTimeText = findViewById(R.id.startTimeText);
         endDateText = findViewById(R.id.endDateText);
@@ -74,7 +80,16 @@ public class CreateSessionActivity extends AppCompatActivity {
         courseCode = getIntent().getStringExtra("courseCode");
         courseName = getIntent().getStringExtra("courseName");
 
+        String mode = getIntent().getStringExtra("mode");
+        sessionId = getIntent().getStringExtra("sessionId");
+
         courseInfoText.setText(courseCode + " - " + courseName);
+
+        if ("edit".equals(mode) && sessionId != null && !sessionId.isEmpty()) {
+            isEditMode = true;
+            saveSessionButton.setText("Update Session");
+            loadSessionForEdit();
+        }
 
         selectStartDateButton.setOnClickListener(v -> showDatePicker("start"));
         selectStartTimeButton.setOnClickListener(v -> showTimePicker("start"));
@@ -84,6 +99,84 @@ public class CreateSessionActivity extends AppCompatActivity {
         saveSessionButton.setOnClickListener(v -> validateAndSaveSession());
 
         backButton.setOnClickListener(v -> finish());
+    }
+
+    private void updateDateTimeDisplay() {
+        if (!startDate.isEmpty() && !startTimeOnly.isEmpty()) {
+            startDateTimeText.setText(startDate + " " + startTimeOnly);
+        } else if (!startDate.isEmpty()) {
+            startDateTimeText.setText(startDate + " --:--");
+        } else if (!startTimeOnly.isEmpty()) {
+            startDateTimeText.setText("---- -- -- " + startTimeOnly);
+        } else {
+            startDateTimeText.setText("Not selected");
+        }
+
+        if (!endDate.isEmpty() && !endTimeOnly.isEmpty()) {
+            endDateTimeText.setText(endDate + " " + endTimeOnly);
+        } else if (!endDate.isEmpty()) {
+            endDateTimeText.setText(endDate + " --:--");
+        } else if (!endTimeOnly.isEmpty()) {
+            endDateTimeText.setText("---- -- -- " + endTimeOnly);
+        } else {
+            endDateTimeText.setText("Not selected");
+        }
+    }
+
+    private void loadSessionForEdit() {
+        db.collection("sessions").document(sessionId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        Toast.makeText(this, "Session not found", Toast.LENGTH_SHORT).show();
+                        finish();
+                        return;
+                    }
+
+                    sessionTitleInput.setText(documentSnapshot.getString("sessionTitle"));
+                    locationNameInput.setText(documentSnapshot.getString("locationName"));
+                    roomNameInput.setText(documentSnapshot.getString("roomName"));
+
+                    Double latitude = documentSnapshot.getDouble("latitude");
+                    Double longitude = documentSnapshot.getDouble("longitude");
+                    Long radiusMeter = documentSnapshot.getLong("radiusMeter");
+
+                    if (latitude != null) {
+                        latitudeInput.setText(String.valueOf(latitude));
+                    }
+
+                    if (longitude != null) {
+                        longitudeInput.setText(String.valueOf(longitude));
+                    }
+
+                    if (radiusMeter != null) {
+                        radiusInput.setText(String.valueOf(radiusMeter));
+                    }
+
+                    String startTime = documentSnapshot.getString("startTime");
+                    String endTime = documentSnapshot.getString("endTime");
+
+                    if (startTime != null && startTime.length() >= 16) {
+                        startDate = startTime.substring(0, 10);
+                        startTimeOnly = startTime.substring(11, 16);
+
+                        startDateText.setText("Start Date: " + startDate);
+                        startTimeText.setText("Start Time: " + startTimeOnly);
+                        updateDateTimeDisplay();
+                    }
+
+                    if (endTime != null && endTime.length() >= 16) {
+                        endDate = endTime.substring(0, 10);
+                        endTimeOnly = endTime.substring(11, 16);
+
+                        endDateText.setText("End Date: " + endDate);
+                        endTimeText.setText("End Time: " + endTimeOnly);
+                        updateDateTimeDisplay();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load session: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    finish();
+                });
     }
 
     private void showDatePicker(String type) {
@@ -108,9 +201,11 @@ public class CreateSessionActivity extends AppCompatActivity {
                     if (type.equals("start")) {
                         startDate = date;
                         startDateText.setText("Start Date: " + date);
+                        updateDateTimeDisplay();
                     } else {
                         endDate = date;
                         endDateText.setText("End Date: " + date);
+                        updateDateTimeDisplay();
                     }
                 },
                 year,
@@ -141,9 +236,11 @@ public class CreateSessionActivity extends AppCompatActivity {
                     if (type.equals("start")) {
                         startTimeOnly = time;
                         startTimeText.setText("Start Time: " + time);
+                        updateDateTimeDisplay();
                     } else {
                         endTimeOnly = time;
                         endTimeText.setText("End Time: " + time);
+                        updateDateTimeDisplay();
                     }
                 },
                 hour,
@@ -228,7 +325,11 @@ public class CreateSessionActivity extends AppCompatActivity {
         String startTime = startDate + " " + startTimeOnly;
         String endTime = endDate + " " + endTimeOnly;
 
-        saveSession(sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime);
+        if (isEditMode) {
+            updateSession(sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime);
+        } else {
+            saveSession(sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime);
+        }
     }
 
     private void saveSession(String sessionTitle, String locationName, String roomName,
@@ -267,6 +368,38 @@ public class CreateSessionActivity extends AppCompatActivity {
                     saveSessionButton.setEnabled(true);
                     saveSessionButton.setText("Save Session");
                     Toast.makeText(this, "Failed to save session: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void updateSession(String sessionTitle, String locationName, String roomName,
+                               double latitude, double longitude, int radiusMeter,
+                               String startTime, String endTime) {
+
+        saveSessionButton.setEnabled(false);
+        saveSessionButton.setText("Updating...");
+
+        Map<String, Object> session = new HashMap<>();
+        session.put("sessionTitle", sessionTitle);
+        session.put("locationName", locationName);
+        session.put("roomName", roomName);
+        session.put("latitude", latitude);
+        session.put("longitude", longitude);
+        session.put("radiusMeter", radiusMeter);
+        session.put("startTime", startTime);
+        session.put("endTime", endTime);
+        session.put("updatedAt", FieldValue.serverTimestamp());
+
+        db.collection("sessions")
+                .document(sessionId)
+                .update(session)
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(this, "Session updated successfully", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    saveSessionButton.setEnabled(true);
+                    saveSessionButton.setText("Update Session");
+                    Toast.makeText(this, "Failed to update session: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
 }

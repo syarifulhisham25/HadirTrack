@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class LecturerDashboardActivity extends AppCompatActivity {
 
-    Button manageCoursesButton, logoutButton;
+    Button manageCoursesButton, logoutButton, profileButton;
     FirebaseAuth auth;
 
     @Override
@@ -22,9 +22,15 @@ public class LecturerDashboardActivity extends AppCompatActivity {
 
         manageCoursesButton = findViewById(R.id.manageCoursesButton);
         logoutButton = findViewById(R.id.logoutButton);
+        profileButton = findViewById(R.id.profileButton);
 
         manageCoursesButton.setOnClickListener(v -> {
             Intent intent = new Intent(LecturerDashboardActivity.this, CourseListActivity.class);
+            startActivity(intent);
+        });
+
+        profileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(LecturerDashboardActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
 
