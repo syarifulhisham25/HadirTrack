@@ -24,7 +24,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyD9KNs73aus01cgiixtmnjWalp8nQ1MMFc" />
+            android:value="#" />
 
         <receiver
             android:name=".NotificationReceiver"
