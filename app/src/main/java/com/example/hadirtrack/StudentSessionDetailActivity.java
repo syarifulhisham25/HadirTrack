@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,6 +21,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class StudentSessionDetailActivity extends AppCompatActivity {
 
     TextView courseTitleText, sessionInfoText;
@@ -28,7 +33,13 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
     FirebaseFirestore db;
     FusedLocationProviderClient fusedLocationClient;
 
+    ActivityResultLauncher<String> notificationPermissionLauncher;
+
     String sessionId, courseId;
+    String courseCodeValue = "";
+    String sessionTitleValue = "";
+    String roomNameValue = "";
+    String startTimeValue = "";
 
     double classLatitude = 0.0;
     double classLongitude = 0.0;
@@ -64,12 +75,37 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
                 }
         );
 
+        NotificationHelper.createNotificationChannel(this);
+
+        notificationPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        scheduleClassNotifications();
+                    }
+                }
+        );
+
+        requestNotificationPermissionIfNeeded();
+
         loadSessionDetails();
 
         backButton.setOnClickListener(v -> finish());
 
         openMapButton.setOnClickListener(v -> openClassLocationInMap());
         checkInButton.setOnClickListener(v -> checkLocationPermission());
+    }
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED) {
+
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void loadSessionDetails() {
@@ -99,6 +135,13 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
         Double longitude = document.getDouble("longitude");
         Long radius = document.getLong("radiusMeter");
 
+        courseCodeValue = courseCode;
+        sessionTitleValue = sessionTitle;
+        roomNameValue = roomName;
+        startTimeValue = startTime;
+
+        scheduleClassNotifications();
+
         if (latitude != null) {
             classLatitude = latitude;
         }
@@ -122,6 +165,63 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
                 + "\n\nClass GPS: " + classLatitude + ", " + classLongitude;
 
         sessionInfoText.setText(info);
+    }
+
+    private void scheduleClassNotifications() {
+        if (startTimeValue == null || startTimeValue.isEmpty()) {
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+        }
+
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            Date startDate = format.parse(startTimeValue);
+
+            if (startDate == null) {
+                return;
+            }
+
+            long classStartMillis = startDate.getTime();
+
+            long startsSoonMillis = classStartMillis - (10 * 60 * 1000);
+            long attendanceReminderMillis = classStartMillis + (30 * 60 * 1000);
+
+            int startsSoonId = Math.abs((sessionId + "_soon").hashCode());
+            int attendanceReminderId = Math.abs((sessionId + "_attendance").hashCode());
+
+            String classTitle = courseCodeValue + " starts soon";
+            String classMessage = sessionTitleValue + " at " + roomNameValue + " starts in 10 minutes.";
+
+            String attendanceTitle = "Attendance reminder";
+            String attendanceMessage = "Have you submitted your attendance for " + courseCodeValue + "?";
+
+            NotificationHelper.scheduleNotification(
+                    this,
+                    startsSoonMillis,
+                    classTitle,
+                    classMessage,
+                    startsSoonId
+            );
+
+            NotificationHelper.scheduleNotification(
+                    this,
+                    attendanceReminderMillis,
+                    attendanceTitle,
+                    attendanceMessage,
+                    attendanceReminderId
+            );
+
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to schedule notification", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void openClassLocationInMap() {
