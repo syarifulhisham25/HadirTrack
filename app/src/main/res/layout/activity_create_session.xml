@@ -57,8 +57,25 @@
             android:background="@android:drawable/edit_text"
             android:layout_marginBottom="12dp" />
 
+        <Button
+            android:id="@+id/useCurrentLocationButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Use My Current Location"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/pickLocationMapButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pick Location on Map"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
         <EditText
             android:id="@+id/latitudeInput"
+            android:enabled="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Latitude e.g. 3.0738"
@@ -69,6 +86,7 @@
 
         <EditText
             android:id="@+id/longitudeInput"
+            android:enabled="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Longitude e.g. 101.5183"

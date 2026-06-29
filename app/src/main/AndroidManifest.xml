@@ -18,9 +18,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HadirTrack"
         tools:targetApi="31">
+        <activity
+            android:name=".MapPickerActivity"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD9KNs73aus01cgiixtmnjWalp8nQ1MMFc" />
+
         <receiver
             android:name=".NotificationReceiver"
             android:exported="false" />
+
         <activity
             android:name=".AttendanceDetailActivity"
             android:exported="false" />

@@ -2,14 +2,22 @@ package com.example.hadirtrack;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.Manifest;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -29,7 +37,13 @@ public class CreateSessionActivity extends AppCompatActivity {
 
     Button selectStartDateButton, selectStartTimeButton,
             selectEndDateButton, selectEndTimeButton,
-            saveSessionButton, backButton;
+            saveSessionButton, backButton,
+            useCurrentLocationButton, pickLocationMapButton;
+
+    FusedLocationProviderClient fusedLocationClient;
+
+    ActivityResultLauncher<String> locationPermissionLauncher;
+    ActivityResultLauncher<Intent> mapPickerLauncher;
 
     FirebaseAuth auth;
     FirebaseFirestore db;
@@ -50,6 +64,7 @@ public class CreateSessionActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         courseInfoText = findViewById(R.id.courseInfoText);
 
@@ -76,12 +91,45 @@ public class CreateSessionActivity extends AppCompatActivity {
         saveSessionButton = findViewById(R.id.saveSessionButton);
         backButton = findViewById(R.id.backButton);
 
+        useCurrentLocationButton = findViewById(R.id.useCurrentLocationButton);
+        pickLocationMapButton = findViewById(R.id.pickLocationMapButton);
+
         courseId = getIntent().getStringExtra("courseId");
         courseCode = getIntent().getStringExtra("courseCode");
         courseName = getIntent().getStringExtra("courseName");
 
         String mode = getIntent().getStringExtra("mode");
         sessionId = getIntent().getStringExtra("sessionId");
+
+        locationPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        getCurrentLocationForSession();
+                    } else {
+                        Toast.makeText(this, "Location permission is required", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        mapPickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        double latitude = result.getData().getDoubleExtra("latitude", 0.0);
+                        double longitude = result.getData().getDoubleExtra("longitude", 0.0);
+
+                        latitudeInput.setText(String.valueOf(latitude));
+                        longitudeInput.setText(String.valueOf(longitude));
+
+                        Toast.makeText(this, "Map location selected", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        useCurrentLocationButton.setOnClickListener(v -> checkLocationPermissionForSession());
+
+        pickLocationMapButton.setOnClickListener(v -> openMapPicker());
 
         courseInfoText.setText(courseCode + " - " + courseName);
 
@@ -401,5 +449,70 @@ public class CreateSessionActivity extends AppCompatActivity {
                     saveSessionButton.setText("Update Session");
                     Toast.makeText(this, "Failed to update session: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
+    }
+
+    private void checkLocationPermissionForSession() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED) {
+
+            getCurrentLocationForSession();
+
+        } else {
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+    }
+
+    private void getCurrentLocationForSession() {
+        useCurrentLocationButton.setEnabled(false);
+        useCurrentLocationButton.setText("Getting location...");
+
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED) {
+            useCurrentLocationButton.setEnabled(true);
+            useCurrentLocationButton.setText("Use My Current Location");
+            return;
+        }
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    useCurrentLocationButton.setEnabled(true);
+                    useCurrentLocationButton.setText("Use My Current Location");
+
+                    if (location == null) {
+                        Toast.makeText(this, "Unable to get location. Please turn on GPS and try again.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    latitudeInput.setText(String.valueOf(location.getLatitude()));
+                    longitudeInput.setText(String.valueOf(location.getLongitude()));
+
+                    Toast.makeText(this, "Current location selected", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    useCurrentLocationButton.setEnabled(true);
+                    useCurrentLocationButton.setText("Use My Current Location");
+                    Toast.makeText(this, "Failed to get location: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void openMapPicker() {
+        Intent intent = new Intent(CreateSessionActivity.this, MapPickerActivity.class);
+
+        String latitudeText = latitudeInput.getText().toString().trim();
+        String longitudeText = longitudeInput.getText().toString().trim();
+
+        if (!latitudeText.isEmpty() && !longitudeText.isEmpty()) {
+            try {
+                intent.putExtra("currentLatitude", Double.parseDouble(latitudeText));
+                intent.putExtra("currentLongitude", Double.parseDouble(longitudeText));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        mapPickerLauncher.launch(intent);
     }
 }
