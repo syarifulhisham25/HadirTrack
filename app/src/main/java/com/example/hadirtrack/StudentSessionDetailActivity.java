@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -27,10 +28,11 @@ import java.util.Locale;
 
 public class StudentSessionDetailActivity extends AppCompatActivity {
 
-    TextView courseTitleText, sessionInfoText;
+    TextView courseTitleText, sessionInfoText, attendanceStatusText;
     Button openMapButton, checkInButton, backButton;
 
     FirebaseFirestore db;
+    FirebaseAuth auth;
     FusedLocationProviderClient fusedLocationClient;
 
     ActivityResultLauncher<String> notificationPermissionLauncher;
@@ -53,6 +55,7 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_student_session_detail);
 
         db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         courseTitleText = findViewById(R.id.courseTitleText);
@@ -60,9 +63,11 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
         checkInButton = findViewById(R.id.checkInButton);
         backButton = findViewById(R.id.backButton);
         openMapButton = findViewById(R.id.openMapButton);
+        attendanceStatusText = findViewById(R.id.attendanceStatusText);
 
         sessionId = getIntent().getStringExtra("sessionId");
         courseId = getIntent().getStringExtra("courseId");
+
 
         locationPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
@@ -94,6 +99,43 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
 
         openMapButton.setOnClickListener(v -> openClassLocationInMap());
         checkInButton.setOnClickListener(v -> checkLocationPermission());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkAttendanceStatus();
+    }
+
+    private void checkAttendanceStatus() {
+        if (auth.getCurrentUser() == null || sessionId == null) {
+            return;
+        }
+
+        String studentUserId = auth.getCurrentUser().getUid();
+        String attendanceDocId = sessionId + "_" + studentUserId;
+
+        db.collection("attendance")
+                .document(attendanceDocId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        attendanceStatusText.setText("Attendance Status: Submitted");
+                        attendanceStatusText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+
+                        checkInButton.setEnabled(false);
+                        checkInButton.setText("Attendance Submitted");
+                    } else {
+                        attendanceStatusText.setText("Attendance Status: Not submitted");
+                        attendanceStatusText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+
+                        checkInButton.setEnabled(true);
+                        checkInButton.setText("Check In");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to check attendance status", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void requestNotificationPermissionIfNeeded() {

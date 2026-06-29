@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class AttendanceListActivity extends AppCompatActivity {
 
-    TextView titleText, subtitleText;
+    TextView titleText, subtitleText, totalPresentText;
     ListView attendanceListView;
     Button backButton;
 
@@ -41,6 +41,7 @@ public class AttendanceListActivity extends AppCompatActivity {
         subtitleText = findViewById(R.id.subtitleText);
         attendanceListView = findViewById(R.id.attendanceListView);
         backButton = findViewById(R.id.backButton);
+        totalPresentText = findViewById(R.id.totalPresentText);
 
         sessionId = getIntent().getStringExtra("sessionId");
         courseId = getIntent().getStringExtra("courseId");
@@ -86,10 +87,13 @@ public class AttendanceListActivity extends AppCompatActivity {
                     attendanceIdList.clear();
 
                     if (queryDocumentSnapshots.isEmpty()) {
+                        totalPresentText.setText("Total Present: 0");
                         attendanceDisplayList.add("No attendance submitted yet");
                         adapter.notifyDataSetChanged();
                         return;
                     }
+
+                    int totalPresent = 0;
 
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         String attendanceId = document.getId();
@@ -112,7 +116,13 @@ public class AttendanceListActivity extends AppCompatActivity {
                                 + "\n\nTap to view";
 
                         attendanceDisplayList.add(displayText);
+
+                        if ("present".equals(status)) {
+                            totalPresent++;
+                        }
                     }
+
+                    totalPresentText.setText("Total Present: " + totalPresent);
 
                     adapter.notifyDataSetChanged();
                 })

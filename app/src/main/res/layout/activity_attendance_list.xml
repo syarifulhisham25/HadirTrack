@@ -26,6 +26,16 @@
         android:textColor="#666666"
         android:layout_marginBottom="24dp" />
 
+    <TextView
+        android:id="@+id/totalPresentText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total Present: 0"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#2D2363"
+        android:layout_marginBottom="16dp" />
+
     <ListView
         android:id="@+id/attendanceListView"
         android:layout_width="match_parent"

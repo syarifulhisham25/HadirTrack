@@ -30,6 +30,16 @@
             android:textColor="#333333"
             android:layout_marginBottom="24dp" />
 
+        <TextView
+            android:id="@+id/attendanceStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Attendance Status: Not submitted"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="16dp" />
+
         <Button
             android:id="@+id/openMapButton"
             android:layout_width="match_parent"
