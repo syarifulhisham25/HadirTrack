@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -22,7 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class StudentSessionDetailActivity extends AppCompatActivity {
 
     TextView courseTitleText, sessionInfoText;
-    Button checkInButton, backButton;
+    Button openMapButton, checkInButton, backButton;
 
     FirebaseFirestore db;
     FusedLocationProviderClient fusedLocationClient;
@@ -47,6 +48,7 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
         sessionInfoText = findViewById(R.id.sessionInfoText);
         checkInButton = findViewById(R.id.checkInButton);
         backButton = findViewById(R.id.backButton);
+        openMapButton = findViewById(R.id.openMapButton);
 
         sessionId = getIntent().getStringExtra("sessionId");
         courseId = getIntent().getStringExtra("courseId");
@@ -66,6 +68,7 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
 
         backButton.setOnClickListener(v -> finish());
 
+        openMapButton.setOnClickListener(v -> openClassLocationInMap());
         checkInButton.setOnClickListener(v -> checkLocationPermission());
     }
 
@@ -119,6 +122,28 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
                 + "\n\nClass GPS: " + classLatitude + ", " + classLongitude;
 
         sessionInfoText.setText(info);
+    }
+
+    private void openClassLocationInMap() {
+        if (classLatitude == 0.0 && classLongitude == 0.0) {
+            Toast.makeText(this, "Class location is not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Uri navigationUri = Uri.parse("google.navigation:q=" + classLatitude + "," + classLongitude);
+
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, navigationUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        try {
+            startActivity(mapIntent);
+        } catch (Exception e) {
+            Uri browserUri = Uri.parse("https://www.google.com/maps/search/?api=1&query="
+                    + classLatitude + "," + classLongitude);
+
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, browserUri);
+            startActivity(browserIntent);
+        }
     }
 
     private void checkLocationPermission() {

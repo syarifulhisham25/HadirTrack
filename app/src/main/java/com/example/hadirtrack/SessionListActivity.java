@@ -155,12 +155,12 @@ public class SessionListActivity extends AppCompatActivity {
     }
 
     private void openSession(int position) {
-        Toast.makeText(this, "Session selected", Toast.LENGTH_SHORT).show();
-
-        // Later we can open lecturer attendance list here.
-        // Intent intent = new Intent(SessionListActivity.this, AttendanceListActivity.class);
-        // intent.putExtra("sessionId", sessionIdList.get(position));
-        // startActivity(intent);
+        Intent intent = new Intent(SessionListActivity.this, AttendanceListActivity.class);
+        intent.putExtra("sessionId", sessionIdList.get(position));
+        intent.putExtra("courseId", courseId);
+        intent.putExtra("courseCode", courseCode);
+        intent.putExtra("courseName", courseName);
+        startActivity(intent);
     }
 
     private void openEditSession(int position) {

@@ -12,39 +12,32 @@
         android:padding="24dp">
 
         <TextView
-            android:id="@+id/courseTitleText"
+            android:id="@+id/titleText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Course Title"
-            android:textSize="28sp"
+            android:text="Attendance Detail"
+            android:textSize="30sp"
             android:textStyle="bold"
             android:textColor="#2D2363"
             android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/sessionInfoText"
+            android:id="@+id/infoText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Session Info"
+            android:text="Attendance info"
             android:textSize="16sp"
             android:textColor="#333333"
             android:layout_marginBottom="24dp" />
 
-        <Button
-            android:id="@+id/openMapButton"
+        <ImageView
+            android:id="@+id/selfieImageView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Open Class Location"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/checkInButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Check In"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
+            android:layout_height="360dp"
+            android:scaleType="centerCrop"
+            android:background="#DDDDDD"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Student selfie" />
 
         <Button
             android:id="@+id/backButton"

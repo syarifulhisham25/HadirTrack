@@ -17,6 +17,12 @@
         android:theme="@style/Theme.HadirTrack"
         tools:targetApi="31">
         <activity
+            android:name=".AttendanceDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AttendanceListActivity"
+            android:exported="false" />
+        <activity
             android:name=".ProfileActivity"
             android:exported="false" />
         <activity
