@@ -3,6 +3,9 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+
 android {
     namespace 'com.example.hadirtrack'
     compileSdk 36
@@ -15,6 +18,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders = [
+                MAPS_API_KEY: localProperties.getProperty("MAPS_API_KEY", "")
+        ]
+
+        buildConfigField "String", "MAPS_API_KEY", "\"${localProperties.getProperty("MAPS_API_KEY", "")}\""
     }
 
     buildTypes {
@@ -26,6 +35,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
+    }
+    buildFeatures {
+        buildConfig true
     }
 }
 
