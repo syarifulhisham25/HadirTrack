@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="#F8F6FF">
+
+    <TextView
+        android:id="@+id/courseTitleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Manage Students"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="#2D2363"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/courseSubtitleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add students to this course"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="24dp" />
+
+    <EditText
+        android:id="@+id/studentSearchInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter student ID or email"
+        android:padding="14dp"
+        android:background="@android:drawable/edit_text"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/addStudentButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Student"
+        android:padding="12dp"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:id="@+id/enrolledTitleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enrolled Students"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#2D2363"
+        android:layout_marginBottom="12dp" />
+
+    <ListView
+        android:id="@+id/studentListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="12dp" />
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Back"
+        android:padding="12dp"
+        android:layout_marginTop="12dp" />
+
+</LinearLayout>

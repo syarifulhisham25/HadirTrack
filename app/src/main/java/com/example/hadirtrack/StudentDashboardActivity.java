@@ -29,6 +29,11 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
     ArrayAdapter<String> adapter;
 
+    ArrayList<String> enrolledCourseIdList = new ArrayList<>();
+
+    int coursesLoadedCount = 0;
+    int totalCoursesToLoad = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +55,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         studentSessionListView.setAdapter(adapter);
 
         studentSessionListView.setOnItemClickListener((parent, view, position, id) -> {
-            if (sessionIdList.isEmpty()) {
+            if (position >= sessionIdList.size()) {
                 return;
             }
 
@@ -76,52 +81,109 @@ public class StudentDashboardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadActiveSessions();
+        loadEnrolledCourses();
     }
 
-    private void loadActiveSessions() {
-        db.collection("sessions")
-                .whereEqualTo("status", "active")
+    private void loadEnrolledCourses() {
+        if (auth.getCurrentUser() == null) {
+            return;
+        }
+
+        String studentUserId = auth.getCurrentUser().getUid();
+
+        sessionDisplayList.clear();
+        sessionIdList.clear();
+        courseIdList.clear();
+        enrolledCourseIdList.clear();
+        adapter.notifyDataSetChanged();
+
+        db.collection("course_students")
+                .whereEqualTo("studentUserId", studentUserId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-
-                    sessionDisplayList.clear();
-                    sessionIdList.clear();
-                    courseIdList.clear();
-
                     if (queryDocumentSnapshots.isEmpty()) {
-                        sessionDisplayList.add("No active sessions available");
+                        sessionDisplayList.add("You are not enrolled in any course yet");
                         adapter.notifyDataSetChanged();
                         return;
                     }
 
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        String sessionId = document.getId();
                         String courseId = document.getString("courseId");
-                        String courseCode = document.getString("courseCode");
-                        String courseName = document.getString("courseName");
-                        String sessionTitle = document.getString("sessionTitle");
-                        String locationName = document.getString("locationName");
-                        String roomName = document.getString("roomName");
-                        String startTime = document.getString("startTime");
-                        String endTime = document.getString("endTime");
 
-                        sessionIdList.add(sessionId);
-                        courseIdList.add(courseId);
-
-                        String displayText = courseCode + " - " + courseName
-                                + "\n" + sessionTitle
-                                + "\nLocation: " + locationName
-                                + "\nRoom: " + roomName
-                                + "\nTime: " + startTime + " - " + endTime;
-
-                        sessionDisplayList.add(displayText);
+                        if (courseId != null && !courseId.isEmpty()) {
+                            enrolledCourseIdList.add(courseId);
+                        }
                     }
 
-                    adapter.notifyDataSetChanged();
+                    if (enrolledCourseIdList.isEmpty()) {
+                        sessionDisplayList.add("You are not enrolled in any course yet");
+                        adapter.notifyDataSetChanged();
+                        return;
+                    }
+
+                    loadSessionsForEnrolledCourses();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to load sessions: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Failed to load enrolled courses: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
+    }
+
+    private void loadSessionsForEnrolledCourses() {
+        sessionDisplayList.clear();
+        sessionIdList.clear();
+        courseIdList.clear();
+
+        coursesLoadedCount = 0;
+        totalCoursesToLoad = enrolledCourseIdList.size();
+
+        for (String enrolledCourseId : enrolledCourseIdList) {
+            db.collection("sessions")
+                    .whereEqualTo("courseId", enrolledCourseId)
+                    .whereEqualTo("status", "active")
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        coursesLoadedCount++;
+
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            String sessionId = document.getId();
+                            String courseId = document.getString("courseId");
+                            String courseCode = document.getString("courseCode");
+                            String courseName = document.getString("courseName");
+                            String sessionTitle = document.getString("sessionTitle");
+                            String locationName = document.getString("locationName");
+                            String roomName = document.getString("roomName");
+                            String startTime = document.getString("startTime");
+                            String endTime = document.getString("endTime");
+
+                            sessionIdList.add(sessionId);
+                            courseIdList.add(courseId);
+
+                            String displayText = courseCode + " - " + courseName
+                                    + "\n" + sessionTitle
+                                    + "\nLocation: " + locationName
+                                    + "\nRoom: " + roomName
+                                    + "\nTime: " + startTime + " - " + endTime;
+
+                            sessionDisplayList.add(displayText);
+                        }
+
+                        checkIfAllCoursesLoaded();
+                    })
+                    .addOnFailureListener(e -> {
+                        coursesLoadedCount++;
+                        Toast.makeText(this, "Failed to load sessions: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        checkIfAllCoursesLoaded();
+                    });
+        }
+    }
+
+    private void checkIfAllCoursesLoaded() {
+        if (coursesLoadedCount >= totalCoursesToLoad) {
+            if (sessionDisplayList.isEmpty()) {
+                sessionDisplayList.add("No active sessions for your enrolled courses");
+            }
+
+            adapter.notifyDataSetChanged();
+        }
     }
 }

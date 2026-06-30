@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class SessionListActivity extends AppCompatActivity {
 
     TextView courseTitleText, courseSubtitleText;
-    Button addSessionButton;
+    Button manageStudentsButton, addSessionButton;
     ListView sessionListView;
 
     FirebaseFirestore db;
@@ -48,6 +48,7 @@ public class SessionListActivity extends AppCompatActivity {
         courseSubtitleText = findViewById(R.id.courseSubtitleText);
         addSessionButton = findViewById(R.id.addSessionButton);
         sessionListView = findViewById(R.id.sessionListView);
+        manageStudentsButton = findViewById(R.id.manageStudentsButton);
 
         courseId = getIntent().getStringExtra("courseId");
         courseCode = getIntent().getStringExtra("courseCode");
@@ -61,6 +62,14 @@ public class SessionListActivity extends AppCompatActivity {
 
         addSessionButton.setOnClickListener(v -> {
             Intent intent = new Intent(SessionListActivity.this, CreateSessionActivity.class);
+            intent.putExtra("courseId", courseId);
+            intent.putExtra("courseCode", courseCode);
+            intent.putExtra("courseName", courseName);
+            startActivity(intent);
+        });
+
+        manageStudentsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(SessionListActivity.this, ManageCourseStudentsActivity.class);
             intent.putExtra("courseId", courseId);
             intent.putExtra("courseCode", courseCode);
             intent.putExtra("courseName", courseName);

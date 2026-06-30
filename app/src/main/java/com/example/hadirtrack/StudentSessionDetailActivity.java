@@ -104,14 +104,47 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        checkAttendanceStatus();
+        checkEnrollmentAndAttendanceStatus();
     }
 
-    private void checkAttendanceStatus() {
-        if (auth.getCurrentUser() == null || sessionId == null) {
+    private void checkEnrollmentAndAttendanceStatus() {
+        if (auth.getCurrentUser() == null || sessionId == null || courseId == null) {
+            checkInButton.setEnabled(false);
+            checkInButton.setText("Not Allowed");
+            attendanceStatusText.setText("Attendance Status: Unable to verify");
+            attendanceStatusText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
             return;
         }
 
+        String studentUserId = auth.getCurrentUser().getUid();
+        String enrollmentDocId = courseId + "_" + studentUserId;
+
+        db.collection("course_students")
+                .document(enrollmentDocId)
+                .get()
+                .addOnSuccessListener(enrollmentSnapshot -> {
+                    if (!enrollmentSnapshot.exists()) {
+                        attendanceStatusText.setText("Attendance Status: Not enrolled in this course");
+                        attendanceStatusText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+
+                        checkInButton.setEnabled(false);
+                        checkInButton.setText("Not Enrolled");
+                        return;
+                    }
+
+                    checkAttendanceStatusOnly();
+                })
+                .addOnFailureListener(e -> {
+                    attendanceStatusText.setText("Attendance Status: Failed to verify enrollment");
+                    attendanceStatusText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+
+                    checkInButton.setEnabled(false);
+                    checkInButton.setText("Unable to Verify");
+                    Toast.makeText(this, "Failed to verify enrollment", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void checkAttendanceStatusOnly() {
         String studentUserId = auth.getCurrentUser().getUid();
         String attendanceDocId = sessionId + "_" + studentUserId;
 
@@ -134,6 +167,11 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> {
+                    attendanceStatusText.setText("Attendance Status: Failed to check");
+                    attendanceStatusText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+
+                    checkInButton.setEnabled(false);
+                    checkInButton.setText("Unable to Check");
                     Toast.makeText(this, "Failed to check attendance status", Toast.LENGTH_SHORT).show();
                 });
     }
