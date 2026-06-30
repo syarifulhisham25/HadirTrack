@@ -1,24 +1,35 @@
 package com.example.hadirtrack;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.Manifest;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class StudentDashboardActivity extends AppCompatActivity {
 
     ListView studentSessionListView;
     Button profileButton, logoutButton;
+
+    ActivityResultLauncher<String> notificationPermissionLauncher;
 
     FirebaseAuth auth;
     FirebaseFirestore db;
@@ -41,6 +52,19 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        NotificationHelper.createNotificationChannel(this);
+
+        notificationPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        loadEnrolledCourses();
+                    }
+                }
+        );
+
+        requestNotificationPermissionIfNeeded();
 
         studentSessionListView = findViewById(R.id.studentSessionListView);
         profileButton = findViewById(R.id.profileButton);
@@ -76,6 +100,18 @@ public class StudentDashboardActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED) {
+
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     @Override
@@ -155,6 +191,8 @@ public class StudentDashboardActivity extends AppCompatActivity {
                             String startTime = document.getString("startTime");
                             String endTime = document.getString("endTime");
 
+                            scheduleNotificationForSession(sessionId, courseCode, sessionTitle, roomName, startTime);
+
                             sessionIdList.add(sessionId);
                             courseIdList.add(courseId);
 
@@ -184,6 +222,72 @@ public class StudentDashboardActivity extends AppCompatActivity {
             }
 
             adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void scheduleNotificationForSession(
+            String sessionId,
+            String courseCode,
+            String sessionTitle,
+            String roomName,
+            String startTime
+    ) {
+        if (sessionId == null || startTime == null || startTime.isEmpty()) {
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+        }
+
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            Date startDate = format.parse(startTime);
+
+            if (startDate == null) {
+                return;
+            }
+
+            long classStartMillis = startDate.getTime();
+
+            // 10 minutes before class
+            long startsSoonMillis = classStartMillis - (10 * 60 * 1000);
+
+            // 30 minutes after class start
+            long attendanceReminderMillis = classStartMillis + (30 * 60 * 1000);
+
+            int startsSoonId = Math.abs((sessionId + "_soon").hashCode());
+            int attendanceReminderId = Math.abs((sessionId + "_attendance").hashCode());
+
+            String classTitle = courseCode + " starts soon";
+            String classMessage = sessionTitle + " at " + roomName + " starts in 10 minutes.";
+
+            String attendanceTitle = "Attendance reminder";
+            String attendanceMessage = "Have you submitted your attendance for " + courseCode + "?";
+
+            NotificationHelper.scheduleNotification(
+                    this,
+                    startsSoonMillis,
+                    classTitle,
+                    classMessage,
+                    startsSoonId
+            );
+
+            NotificationHelper.scheduleNotification(
+                    this,
+                    attendanceReminderMillis,
+                    attendanceTitle,
+                    attendanceMessage,
+                    attendanceReminderId
+            );
+
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to schedule notification", Toast.LENGTH_SHORT).show();
         }
     }
 }
