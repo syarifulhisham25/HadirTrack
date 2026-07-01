@@ -226,6 +226,104 @@
             android:layout_height="0dp"
             android:visibility="gone" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Class Images"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#2D2363"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="At least 1 image is required. Maximum 3 images."
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="12dp" />
+
+        <ImageView
+            android:id="@+id/classImage1View"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="#DDDDDD"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/captureImage1Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Capture Image 1 Required"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/removeImage1Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Remove Image 1"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <ImageView
+            android:id="@+id/classImage2View"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="#DDDDDD"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/captureImage2Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Capture Image 2 Optional"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/removeImage2Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Remove Image 2"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <ImageView
+            android:id="@+id/classImage3View"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="#DDDDDD"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/captureImage3Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Capture Image 3 Optional"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/removeImage3Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Remove Image 3"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/classRemarkInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Remark optional e.g. Near BK15 entrance"
+            android:padding="14dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="24dp" />
+
         <Button
             android:id="@+id/saveSessionButton"
             android:layout_width="match_parent"

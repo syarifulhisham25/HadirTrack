@@ -31,6 +31,54 @@
             android:layout_marginBottom="24dp" />
 
         <TextView
+            android:id="@+id/classRemarkText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Remark: -"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/classImagesTitleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Class Images"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#2D2363"
+            android:layout_marginBottom="12dp" />
+
+        <ImageView
+            android:id="@+id/classImage1View"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="#DDDDDD"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="12dp"
+            android:contentDescription="Class image 1" />
+
+        <ImageView
+            android:id="@+id/classImage2View"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="#DDDDDD"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="12dp"
+            android:contentDescription="Class image 2"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/classImage3View"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="#DDDDDD"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="20dp"
+            android:contentDescription="Class image 3"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/attendanceStatusText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

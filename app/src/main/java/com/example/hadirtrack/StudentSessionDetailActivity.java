@@ -6,7 +6,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,17 +17,21 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.List;
+
 
 public class StudentSessionDetailActivity extends AppCompatActivity {
 
-    TextView courseTitleText, sessionInfoText, attendanceStatusText;
+    TextView courseTitleText, sessionInfoText, attendanceStatusText, classRemarkText, classImagesTitleText;
     Button openMapButton, checkInButton, backButton;
+    ImageView classImage1View, classImage2View, classImage3View;
 
     FirebaseFirestore db;
     FirebaseAuth auth;
@@ -54,6 +60,12 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
         backButton = findViewById(R.id.backButton);
         openMapButton = findViewById(R.id.openMapButton);
         attendanceStatusText = findViewById(R.id.attendanceStatusText);
+        classRemarkText = findViewById(R.id.classRemarkText);
+        classImagesTitleText = findViewById(R.id.classImagesTitleText);
+
+        classImage1View = findViewById(R.id.classImage1View);
+        classImage2View = findViewById(R.id.classImage2View);
+        classImage3View = findViewById(R.id.classImage3View);
 
         sessionId = getIntent().getStringExtra("sessionId");
         courseId = getIntent().getStringExtra("courseId");
@@ -175,6 +187,8 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
         String roomName = document.getString("roomName");
         String startTime = document.getString("startTime");
         String endTime = document.getString("endTime");
+        String classRemark = document.getString("classRemark");
+        List<String> classImageUrls = (List<String>) document.get("classImageUrls");
 
         Double latitude = document.getDouble("latitude");
         Double longitude = document.getDouble("longitude");
@@ -203,6 +217,7 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
                 + "\n\nClass GPS: " + classLatitude + ", " + classLongitude;
 
         sessionInfoText.setText(info);
+        displayClassRemarkAndImages(classRemark, classImageUrls);
     }
 
     private void openClassLocationInMap() {
@@ -302,5 +317,65 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG
             ).show();
         }
+    }
+
+    private void displayClassRemarkAndImages(String classRemark, List<String> classImageUrls) {
+        if (classRemark != null && !classRemark.isEmpty()) {
+            classRemarkText.setText("Remark: " + classRemark);
+            classRemarkText.setVisibility(View.VISIBLE);
+        } else {
+            classRemarkText.setText("Remark: -");
+            classRemarkText.setVisibility(View.VISIBLE);
+        }
+
+        classImage1View.setVisibility(View.GONE);
+        classImage2View.setVisibility(View.GONE);
+        classImage3View.setVisibility(View.GONE);
+
+        if (classImageUrls == null || classImageUrls.isEmpty()) {
+            classImagesTitleText.setVisibility(View.GONE);
+            return;
+        }
+
+        classImagesTitleText.setVisibility(View.VISIBLE);
+
+        if (classImageUrls.size() >= 1) {
+            String imageUrl1 = classImageUrls.get(0);
+
+            classImage1View.setVisibility(View.VISIBLE);
+            Glide.with(this)
+                    .load(imageUrl1)
+                    .into(classImage1View);
+
+            classImage1View.setOnClickListener(v -> openFullImage(imageUrl1));
+        }
+
+        if (classImageUrls.size() >= 2) {
+            String imageUrl2 = classImageUrls.get(1);
+
+            classImage2View.setVisibility(View.VISIBLE);
+            Glide.with(this)
+                    .load(imageUrl2)
+                    .into(classImage2View);
+
+            classImage2View.setOnClickListener(v -> openFullImage(imageUrl2));
+        }
+
+        if (classImageUrls.size() >= 3) {
+            String imageUrl3 = classImageUrls.get(2);
+
+            classImage3View.setVisibility(View.VISIBLE);
+            Glide.with(this)
+                    .load(imageUrl3)
+                    .into(classImage3View);
+
+            classImage3View.setOnClickListener(v -> openFullImage(imageUrl3));
+        }
+    }
+
+    private void openFullImage(String imageUrl) {
+        Intent intent = new Intent(StudentSessionDetailActivity.this, FullImageActivity.class);
+        intent.putExtra("imageUrl", imageUrl);
+        startActivity(intent);
     }
 }

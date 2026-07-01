@@ -4,9 +4,12 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.Manifest;
@@ -16,14 +19,20 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -33,12 +42,31 @@ public class CreateSessionActivity extends AppCompatActivity {
     TextView startDateTimeText, endDateTimeText;
 
     EditText sessionTitleInput, locationNameInput, roomNameInput,
-            latitudeInput, longitudeInput, radiusInput;
+            latitudeInput, longitudeInput, radiusInput, classRemarkInput;
 
     Button selectStartDateButton, selectStartTimeButton,
             selectEndDateButton, selectEndTimeButton,
             saveSessionButton, backButton,
-            useCurrentLocationButton, pickLocationMapButton;
+            useCurrentLocationButton, pickLocationMapButton, captureImage1Button, captureImage2Button, captureImage3Button,
+            removeImage1Button, removeImage2Button, removeImage3Button;
+
+    ImageView classImage1View, classImage2View, classImage3View;
+
+    ArrayList<String> existingClassImageUrls = new ArrayList<>();
+    boolean removeImage1 = false;
+    boolean removeImage2 = false;
+    boolean removeImage3 = false;
+
+    FirebaseStorage storage;
+
+    Bitmap classImage1Bitmap = null;
+    Bitmap classImage2Bitmap = null;
+    Bitmap classImage3Bitmap = null;
+
+    int selectedImageSlot = 0;
+
+    ActivityResultLauncher<String> cameraPermissionLauncher;
+    ActivityResultLauncher<Intent> classImageCameraLauncher;
 
     FusedLocationProviderClient fusedLocationClient;
 
@@ -64,6 +92,7 @@ public class CreateSessionActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         courseInfoText = findViewById(R.id.courseInfoText);
@@ -93,6 +122,20 @@ public class CreateSessionActivity extends AppCompatActivity {
 
         useCurrentLocationButton = findViewById(R.id.useCurrentLocationButton);
         pickLocationMapButton = findViewById(R.id.pickLocationMapButton);
+
+        classImage1View = findViewById(R.id.classImage1View);
+        classImage2View = findViewById(R.id.classImage2View);
+        classImage3View = findViewById(R.id.classImage3View);
+
+        captureImage1Button = findViewById(R.id.captureImage1Button);
+        captureImage2Button = findViewById(R.id.captureImage2Button);
+        captureImage3Button = findViewById(R.id.captureImage3Button);
+
+        removeImage1Button = findViewById(R.id.removeImage1Button);
+        removeImage2Button = findViewById(R.id.removeImage2Button);
+        removeImage3Button = findViewById(R.id.removeImage3Button);
+
+        classRemarkInput = findViewById(R.id.classRemarkInput);
 
         courseId = getIntent().getStringExtra("courseId");
         courseCode = getIntent().getStringExtra("courseCode");
@@ -144,6 +187,80 @@ public class CreateSessionActivity extends AppCompatActivity {
         selectEndDateButton.setOnClickListener(v -> showDatePicker("end"));
         selectEndTimeButton.setOnClickListener(v -> showTimePicker("end"));
 
+        cameraPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        openClassImageCamera();
+                    } else {
+                        Toast.makeText(this, "Camera permission is required", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        classImageCameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Bundle extras = result.getData().getExtras();
+
+                        if (extras != null) {
+                            Bitmap bitmap = (Bitmap) extras.get("data");
+
+                            if (selectedImageSlot == 1) {
+                                classImage1Bitmap = bitmap;
+                                classImage1View.setImageBitmap(bitmap);
+                            } else if (selectedImageSlot == 2) {
+                                classImage2Bitmap = bitmap;
+                                classImage2View.setImageBitmap(bitmap);
+                            } else if (selectedImageSlot == 3) {
+                                classImage3Bitmap = bitmap;
+                                classImage3View.setImageBitmap(bitmap);
+                            }
+                        }
+                    }
+                }
+        );
+
+        captureImage1Button.setOnClickListener(v -> {
+            selectedImageSlot = 1;
+            checkCameraPermissionForClassImage();
+        });
+
+        captureImage2Button.setOnClickListener(v -> {
+            selectedImageSlot = 2;
+            checkCameraPermissionForClassImage();
+        });
+
+        captureImage3Button.setOnClickListener(v -> {
+            selectedImageSlot = 3;
+            checkCameraPermissionForClassImage();
+        });
+
+        removeImage1Button.setOnClickListener(v -> {
+            removeImage1 = true;
+            classImage1Bitmap = null;
+            classImage1View.setImageDrawable(null);
+            classImage1View.setBackgroundColor(0xFFDDDDDD);
+            Toast.makeText(this, "Image 1 removed", Toast.LENGTH_SHORT).show();
+        });
+
+        removeImage2Button.setOnClickListener(v -> {
+            removeImage2 = true;
+            classImage2Bitmap = null;
+            classImage2View.setImageDrawable(null);
+            classImage2View.setBackgroundColor(0xFFDDDDDD);
+            Toast.makeText(this, "Image 2 removed", Toast.LENGTH_SHORT).show();
+        });
+
+        removeImage3Button.setOnClickListener(v -> {
+            removeImage3 = true;
+            classImage3Bitmap = null;
+            classImage3View.setImageDrawable(null);
+            classImage3View.setBackgroundColor(0xFFDDDDDD);
+            Toast.makeText(this, "Image 3 removed", Toast.LENGTH_SHORT).show();
+        });
+
         saveSessionButton.setOnClickListener(v -> validateAndSaveSession());
 
         backButton.setOnClickListener(v -> finish());
@@ -184,6 +301,11 @@ public class CreateSessionActivity extends AppCompatActivity {
                     locationNameInput.setText(documentSnapshot.getString("locationName"));
                     roomNameInput.setText(documentSnapshot.getString("roomName"));
 
+                    String classRemark = documentSnapshot.getString("classRemark");
+                    if (classRemark != null) {
+                        classRemarkInput.setText(classRemark);
+                    }
+
                     Double latitude = documentSnapshot.getDouble("latitude");
                     Double longitude = documentSnapshot.getDouble("longitude");
                     Long radiusMeter = documentSnapshot.getLong("radiusMeter");
@@ -209,7 +331,6 @@ public class CreateSessionActivity extends AppCompatActivity {
 
                         startDateText.setText("Start Date: " + startDate);
                         startTimeText.setText("Start Time: " + startTimeOnly);
-                        updateDateTimeDisplay();
                     }
 
                     if (endTime != null && endTime.length() >= 16) {
@@ -218,8 +339,35 @@ public class CreateSessionActivity extends AppCompatActivity {
 
                         endDateText.setText("End Date: " + endDate);
                         endTimeText.setText("End Time: " + endTimeOnly);
-                        updateDateTimeDisplay();
                     }
+
+                    List<String> classImageUrls = (List<String>) documentSnapshot.get("classImageUrls");
+
+                    existingClassImageUrls.clear();
+
+                    if (classImageUrls != null) {
+                        existingClassImageUrls.addAll(classImageUrls);
+
+                        if (classImageUrls.size() >= 1) {
+                            Glide.with(this)
+                                    .load(classImageUrls.get(0))
+                                    .into(classImage1View);
+                        }
+
+                        if (classImageUrls.size() >= 2) {
+                            Glide.with(this)
+                                    .load(classImageUrls.get(1))
+                                    .into(classImage2View);
+                        }
+
+                        if (classImageUrls.size() >= 3) {
+                            Glide.with(this)
+                                    .load(classImageUrls.get(2))
+                                    .into(classImage3View);
+                        }
+                    }
+
+                    updateDateTimeDisplay();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load session: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -373,16 +521,31 @@ public class CreateSessionActivity extends AppCompatActivity {
         String startTime = startDate + " " + startTimeOnly;
         String endTime = endDate + " " + endTimeOnly;
 
-        if (isEditMode) {
-            updateSession(sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime);
-        } else {
-            saveSession(sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime);
+        String classRemark = classRemarkInput.getText().toString().trim();
+
+        if (!isEditMode && classImage1Bitmap == null) {
+            Toast.makeText(this, "Class image 1 is required", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        uploadClassImagesThenSave(
+                sessionTitle,
+                locationName,
+                roomName,
+                latitude,
+                longitude,
+                radiusMeter,
+                startTime,
+                endTime,
+                classRemark
+        );
     }
 
     private void saveSession(String sessionTitle, String locationName, String roomName,
                              double latitude, double longitude, int radiusMeter,
-                             String startTime, String endTime) {
+                             String startTime, String endTime,
+                             String classRemark,
+                             ArrayList<String> classImageUrls) {
 
         String lecturerId = auth.getCurrentUser().getUid();
 
@@ -405,6 +568,8 @@ public class CreateSessionActivity extends AppCompatActivity {
         session.put("classPhotoUrl", "");
         session.put("status", "active");
         session.put("createdAt", FieldValue.serverTimestamp());
+        session.put("classImageUrls", classImageUrls);
+        session.put("classRemark", classRemark);
 
         db.collection("sessions")
                 .add(session)
@@ -421,7 +586,9 @@ public class CreateSessionActivity extends AppCompatActivity {
 
     private void updateSession(String sessionTitle, String locationName, String roomName,
                                double latitude, double longitude, int radiusMeter,
-                               String startTime, String endTime) {
+                               String startTime, String endTime,
+                               String classRemark,
+                               ArrayList<String> classImageUrls){
 
         saveSessionButton.setEnabled(false);
         saveSessionButton.setText("Updating...");
@@ -436,6 +603,9 @@ public class CreateSessionActivity extends AppCompatActivity {
         session.put("startTime", startTime);
         session.put("endTime", endTime);
         session.put("updatedAt", FieldValue.serverTimestamp());
+        session.put("classRemark", classRemark);
+
+        session.put("classImageUrls", classImageUrls);
 
         db.collection("sessions")
                 .document(sessionId)
@@ -514,5 +684,209 @@ public class CreateSessionActivity extends AppCompatActivity {
         }
 
         mapPickerLauncher.launch(intent);
+    }
+
+    private void checkCameraPermissionForClassImage() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED) {
+
+            openClassImageCamera();
+
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+        }
+    }
+
+    private void openClassImageCamera() {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        classImageCameraLauncher.launch(cameraIntent);
+    }
+
+    private void uploadClassImagesThenSave(
+            String sessionTitle,
+            String locationName,
+            String roomName,
+            double latitude,
+            double longitude,
+            int radiusMeter,
+            String startTime,
+            String endTime,
+            String classRemark
+    ) {
+        saveSessionButton.setEnabled(false);
+        saveSessionButton.setText("Uploading images...");
+
+        ArrayList<Bitmap> imageBitmaps = new ArrayList<>();
+
+        if (classImage1Bitmap != null) {
+            imageBitmaps.add(classImage1Bitmap);
+        }
+
+        if (classImage2Bitmap != null) {
+            imageBitmaps.add(classImage2Bitmap);
+        }
+
+        if (classImage3Bitmap != null) {
+            imageBitmaps.add(classImage3Bitmap);
+        }
+
+        ArrayList<String> uploadedUrls = new ArrayList<>();
+
+        if (imageBitmaps.isEmpty()) {
+            if (isEditMode) {
+                ArrayList<String> remainingUrls = getRemainingExistingImageUrls();
+
+                if (remainingUrls.isEmpty()) {
+                    Toast.makeText(this, "At least 1 class image is required", Toast.LENGTH_SHORT).show();
+                    saveSessionButton.setEnabled(true);
+                    saveSessionButton.setText("Update Session");
+                    return;
+                }
+
+                updateSession(
+                        sessionTitle,
+                        locationName,
+                        roomName,
+                        latitude,
+                        longitude,
+                        radiusMeter,
+                        startTime,
+                        endTime,
+                        classRemark,
+                        remainingUrls
+                );
+            } else {
+                Toast.makeText(this, "Please capture at least 1 class image", Toast.LENGTH_SHORT).show();
+                saveSessionButton.setEnabled(true);
+                saveSessionButton.setText("Save Session");
+            }
+            return;
+        }
+
+        uploadImageAtIndex(
+                imageBitmaps,
+                uploadedUrls,
+                0,
+                sessionTitle,
+                locationName,
+                roomName,
+                latitude,
+                longitude,
+                radiusMeter,
+                startTime,
+                endTime,
+                classRemark
+        );
+    }
+
+    private void uploadImageAtIndex(
+            ArrayList<Bitmap> imageBitmaps,
+            ArrayList<String> uploadedUrls,
+            int index,
+            String sessionTitle,
+            String locationName,
+            String roomName,
+            double latitude,
+            double longitude,
+            int radiusMeter,
+            String startTime,
+            String endTime,
+            String classRemark
+    ) {
+        if (index >= imageBitmaps.size()) {
+            if (isEditMode) {
+                ArrayList<String> finalUrls = getRemainingExistingImageUrls();
+                finalUrls.addAll(uploadedUrls);
+
+                if (finalUrls.size() > 3) {
+                    Toast.makeText(this, "Maximum 3 class images only. Remove old image first.", Toast.LENGTH_LONG).show();
+                    saveSessionButton.setEnabled(true);
+                    saveSessionButton.setText("Update Session");
+                    return;
+                }
+
+                if (finalUrls.isEmpty()) {
+                    Toast.makeText(this, "At least 1 class image is required", Toast.LENGTH_SHORT).show();
+                    saveSessionButton.setEnabled(true);
+                    saveSessionButton.setText("Update Session");
+                    return;
+                }
+
+                updateSession(
+                        sessionTitle,
+                        locationName,
+                        roomName,
+                        latitude,
+                        longitude,
+                        radiusMeter,
+                        startTime,
+                        endTime,
+                        classRemark,
+                        finalUrls
+                );
+            } else {
+                saveSession(sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime, classRemark, uploadedUrls);
+            }
+            return;
+        }
+
+        Bitmap bitmap = imageBitmaps.get(index);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+        byte[] imageData = baos.toByteArray();
+
+        String fileName = "class_images/" + courseId + "/" + System.currentTimeMillis() + "_" + (index + 1) + ".jpg";
+
+        StorageReference imageRef = storage.getReference().child(fileName);
+
+        imageRef.putBytes(imageData)
+                .addOnSuccessListener(taskSnapshot -> {
+                    imageRef.getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                uploadedUrls.add(uri.toString());
+
+                                uploadImageAtIndex(
+                                        imageBitmaps,
+                                        uploadedUrls,
+                                        index + 1,
+                                        sessionTitle,
+                                        locationName,
+                                        roomName,
+                                        latitude,
+                                        longitude,
+                                        radiusMeter,
+                                        startTime,
+                                        endTime,
+                                        classRemark
+                                );
+                            })
+                            .addOnFailureListener(e -> {
+                                saveSessionButton.setEnabled(true);
+                                saveSessionButton.setText(isEditMode ? "Update Session" : "Save Session");
+                                Toast.makeText(this, "Failed to get image URL: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    saveSessionButton.setEnabled(true);
+                    saveSessionButton.setText(isEditMode ? "Update Session" : "Save Session");
+                    Toast.makeText(this, "Failed to upload image: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private ArrayList<String> getRemainingExistingImageUrls() {
+        ArrayList<String> finalUrls = new ArrayList<>();
+
+        for (int i = 0; i < existingClassImageUrls.size(); i++) {
+            if (i == 0 && removeImage1) continue;
+            if (i == 1 && removeImage2) continue;
+            if (i == 2 && removeImage3) continue;
+
+            finalUrls.add(existingClassImageUrls.get(i));
+        }
+
+        return finalUrls;
     }
 }
