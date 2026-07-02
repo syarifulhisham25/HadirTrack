@@ -3,341 +3,482 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F6FF">
+    android:fillViewport="true"
+    android:background="@drawable/bg_app_gradient">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="22dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Create Session"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:textColor="#2D2363"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/courseInfoText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Course info"
-            android:textSize="16sp"
-            android:textColor="#666666"
-            android:layout_marginBottom="24dp" />
-
-        <EditText
-            android:id="@+id/sessionTitleInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Session Title e.g. Week 5 Lecture"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="12dp" />
-
-        <EditText
-            android:id="@+id/locationNameInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Location Name e.g. Faculty of Computer and Mathematical Sciences"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="12dp" />
-
-        <EditText
-            android:id="@+id/roomNameInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Room Name e.g. BK15"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/useCurrentLocationButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Use My Current Location"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/pickLocationMapButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Pick Location on Map"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
-
-        <EditText
-            android:id="@+id/latitudeInput"
-            android:enabled="false"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Latitude e.g. 3.0738"
-            android:inputType="numberDecimal|numberSigned"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="12dp" />
-
-        <EditText
-            android:id="@+id/longitudeInput"
-            android:enabled="false"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Longitude e.g. 101.5183"
-            android:inputType="numberDecimal|numberSigned"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="12dp" />
-
-        <EditText
-            android:id="@+id/radiusInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Radius Meter e.g. 50"
-            android:inputType="number"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Start Date & Time Section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Start Date &amp; Time"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#2D2363"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="6dp" />
-
-        <TextView
-            android:id="@+id/startDateTimeText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Not selected"
-            android:textSize="15sp"
-            android:textColor="#333333"
-            android:layout_marginBottom="8dp" />
-
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="18dp">
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Create Session"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="#2D2363" />
+
+                <TextView
+                    android:id="@+id/courseInfoText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Course info"
+                    android:textSize="14sp"
+                    android:textColor="#666666" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Session Details Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
+            android:padding="18dp"
             android:layout_marginBottom="16dp">
 
-            <Button
-                android:id="@+id/selectStartDateButton"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Select Date"
-                android:padding="12dp" />
+                android:text="Session Details"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D2363"
+                android:layout_marginBottom="12dp" />
 
-            <Space
-                android:layout_width="12dp"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:id="@+id/selectStartTimeButton"
-                android:layout_width="0dp"
+            <EditText
+                android:id="@+id/sessionTitleInput"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Select Time"
-                android:padding="12dp" />
+                android:hint="Session title e.g. Week 5 Lecture"
+                android:padding="14dp"
+                android:background="@drawable/bg_input"
+                android:textColor="#1E1E1E"
+                android:textColorHint="#999999"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/locationNameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Location name e.g. FSKM"
+                android:padding="14dp"
+                android:background="@drawable/bg_input"
+                android:textColor="#1E1E1E"
+                android:textColorHint="#999999"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/roomNameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Room name e.g. BK15"
+                android:padding="14dp"
+                android:background="@drawable/bg_input"
+                android:textColor="#1E1E1E"
+                android:textColorHint="#999999" />
+
         </LinearLayout>
 
-        <!-- Hidden TextViews to keep Java IDs compatible -->
-        <TextView
-            android:id="@+id/startDateText"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/startTimeText"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone" />
-
-
-        <!-- End Date & Time Section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="End Date &amp; Time"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#2D2363"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="6dp" />
-
-        <TextView
-            android:id="@+id/endDateTimeText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Not selected"
-            android:textSize="15sp"
-            android:textColor="#333333"
-            android:layout_marginBottom="8dp" />
-
+        <!-- Location Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="24dp">
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
+            android:padding="18dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Class Location"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D2363"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Use GPS or pick location on map for attendance validation."
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="14dp" />
 
             <Button
-                android:id="@+id/selectEndDateButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Select Date"
-                android:padding="12dp" />
+                android:id="@+id/useCurrentLocationButton"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Use My Current Location"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_primary"
+                android:layout_marginBottom="10dp" />
 
-            <Space
-                android:layout_width="12dp"
-                android:layout_height="wrap_content" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/pickLocationMapButton"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Pick Location on Map"
+                android:textColor="#2D2363"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_secondary"
+                android:layout_marginBottom="14dp" />
 
-            <Button
-                android:id="@+id/selectEndTimeButton"
-                android:layout_width="0dp"
+            <EditText
+                android:id="@+id/latitudeInput"
+                android:enabled="false"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Select Time"
-                android:padding="12dp" />
+                android:hint="Latitude"
+                android:inputType="numberDecimal|numberSigned"
+                android:padding="14dp"
+                android:background="@drawable/bg_input"
+                android:textColor="#1E1E1E"
+                android:textColorHint="#999999"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/longitudeInput"
+                android:enabled="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Longitude"
+                android:inputType="numberDecimal|numberSigned"
+                android:padding="14dp"
+                android:background="@drawable/bg_input"
+                android:textColor="#1E1E1E"
+                android:textColorHint="#999999"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/radiusInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Allowed radius in meters e.g. 50"
+                android:inputType="number"
+                android:padding="14dp"
+                android:background="@drawable/bg_input"
+                android:textColor="#1E1E1E"
+                android:textColorHint="#999999" />
+
         </LinearLayout>
 
-        <!-- Hidden TextViews to keep Java IDs compatible -->
-        <TextView
-            android:id="@+id/endDateText"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/endTimeText"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone" />
-
-        <TextView
+        <!-- Date Time Card -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Class Images"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#2D2363"
-            android:layout_marginBottom="8dp" />
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
+            android:padding="18dp"
+            android:layout_marginBottom="16dp">
 
-        <TextView
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Date &amp; Time"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D2363"
+                android:layout_marginBottom="14dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Start Date &amp; Time"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#2D2363"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:id="@+id/startDateTimeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Not selected"
+                android:textSize="15sp"
+                android:textColor="#1E1E1E"
+                android:background="@drawable/bg_input"
+                android:padding="14dp"
+                android:layout_marginBottom="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="18dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/selectStartDateButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Select Date"
+                    android:textColor="#2D2363"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_button_secondary" />
+
+                <Space
+                    android:layout_width="10dp"
+                    android:layout_height="wrap_content" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/selectStartTimeButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Select Time"
+                    android:textColor="#2D2363"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_button_secondary" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/startDateText"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/startTimeText"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="End Date &amp; Time"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#2D2363"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:id="@+id/endDateTimeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Not selected"
+                android:textSize="15sp"
+                android:textColor="#1E1E1E"
+                android:background="@drawable/bg_input"
+                android:padding="14dp"
+                android:layout_marginBottom="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/selectEndDateButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Select Date"
+                    android:textColor="#2D2363"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_button_secondary" />
+
+                <Space
+                    android:layout_width="10dp"
+                    android:layout_height="wrap_content" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/selectEndTimeButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Select Time"
+                    android:textColor="#2D2363"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_button_secondary" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/endDateText"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/endTimeText"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Class Images Card -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="At least 1 image is required. Maximum 3 images."
-            android:textSize="14sp"
-            android:textColor="#666666"
-            android:layout_marginBottom="12dp" />
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
+            android:padding="18dp"
+            android:layout_marginBottom="16dp">
 
-        <ImageView
-            android:id="@+id/classImage1View"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:background="#DDDDDD"
-            android:scaleType="centerCrop"
-            android:layout_marginBottom="8dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Class Images"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D2363"
+                android:layout_marginBottom="6dp" />
 
-        <Button
-            android:id="@+id/captureImage1Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Capture Image 1 Required"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Capture at least 1 image to help students find the class. Maximum 3 images."
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="14dp" />
 
-        <Button
-            android:id="@+id/removeImage1Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Remove Image 1"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
+            <ImageView
+                android:id="@+id/classImage1View"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:background="#E7DEFF"
+                android:scaleType="centerCrop"
+                android:contentDescription="Class Image 1"
+                android:layout_marginBottom="10dp" />
 
-        <ImageView
-            android:id="@+id/classImage2View"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:background="#DDDDDD"
-            android:scaleType="centerCrop"
-            android:layout_marginBottom="8dp" />
+            <Button
+                android:id="@+id/captureImage1Button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Capture Image 1 Required"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_primary"
+                android:layout_marginBottom="8dp" />
 
-        <Button
-            android:id="@+id/captureImage2Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Capture Image 2 Optional"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/removeImage1Button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Remove Image 1"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_danger"
+                android:layout_marginBottom="16dp" />
 
-        <Button
-            android:id="@+id/removeImage2Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Remove Image 2"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
+            <ImageView
+                android:id="@+id/classImage2View"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:background="#E7DEFF"
+                android:scaleType="centerCrop"
+                android:contentDescription="Class Image 2"
+                android:layout_marginBottom="10dp" />
 
-        <ImageView
-            android:id="@+id/classImage3View"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:background="#DDDDDD"
-            android:scaleType="centerCrop"
-            android:layout_marginBottom="8dp" />
+            <Button
+                android:id="@+id/captureImage2Button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Capture Image 2 Optional"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_primary"
+                android:layout_marginBottom="8dp" />
 
-        <Button
-            android:id="@+id/captureImage3Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Capture Image 3 Optional"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/removeImage2Button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Remove Image 2"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_danger"
+                android:layout_marginBottom="16dp" />
 
-        <Button
-            android:id="@+id/removeImage3Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Remove Image 3"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
+            <ImageView
+                android:id="@+id/classImage3View"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:background="#E7DEFF"
+                android:scaleType="centerCrop"
+                android:contentDescription="Class Image 3"
+                android:layout_marginBottom="10dp" />
 
-        <EditText
-            android:id="@+id/classRemarkInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Remark optional e.g. Near BK15 entrance"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="24dp" />
+            <Button
+                android:id="@+id/captureImage3Button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Capture Image 3 Optional"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_primary"
+                android:layout_marginBottom="8dp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/removeImage3Button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Remove Image 3"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_danger"
+                android:layout_marginBottom="14dp" />
+
+            <EditText
+                android:id="@+id/classRemarkInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Remark optional e.g. Near BK15 entrance"
+                android:minLines="2"
+                android:gravity="top"
+                android:padding="14dp"
+                android:background="@drawable/bg_input"
+                android:textColor="#1E1E1E"
+                android:textColorHint="#999999" />
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/saveSessionButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="54dp"
             android:text="Save Session"
-            android:padding="12dp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button_primary"
             android:layout_marginBottom="12dp" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/backButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="54dp"
             android:text="Back"
-            android:padding="12dp" />
+            android:textColor="#2D2363"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button_secondary"
+            android:layout_marginBottom="24dp" />
 
     </LinearLayout>
 </ScrollView>

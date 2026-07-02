@@ -1,14 +1,17 @@
 package com.example.hadirtrack;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.Manifest;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -27,7 +30,7 @@ import java.util.Locale;
 public class StudentDashboardActivity extends AppCompatActivity {
 
     ListView studentSessionListView;
-    Button profileButton, logoutButton;
+    View sessionsTab, profileButton, logoutButton;
 
     ActivityResultLauncher<String> notificationPermissionLauncher;
 
@@ -38,7 +41,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
     ArrayList<String> sessionIdList = new ArrayList<>();
     ArrayList<String> courseIdList = new ArrayList<>();
 
-    ArrayAdapter<String> adapter;
+    SessionAdapter adapter;
 
     ArrayList<String> enrolledCourseIdList = new ArrayList<>();
 
@@ -67,15 +70,11 @@ public class StudentDashboardActivity extends AppCompatActivity {
         requestNotificationPermissionIfNeeded();
 
         studentSessionListView = findViewById(R.id.studentSessionListView);
+        sessionsTab = findViewById(R.id.sessionsTab);
         profileButton = findViewById(R.id.profileButton);
         logoutButton = findViewById(R.id.logoutButton);
 
-        adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                sessionDisplayList
-        );
-
+        adapter = new SessionAdapter();
         studentSessionListView.setAdapter(adapter);
 
         studentSessionListView.setOnItemClickListener((parent, view, position, id) -> {
@@ -87,6 +86,10 @@ public class StudentDashboardActivity extends AppCompatActivity {
             intent.putExtra("sessionId", sessionIdList.get(position));
             intent.putExtra("courseId", courseIdList.get(position));
             startActivity(intent);
+        });
+
+        sessionsTab.setOnClickListener(v -> {
+            Toast.makeText(this, "You are already viewing sessions", Toast.LENGTH_SHORT).show();
         });
 
         profileButton.setOnClickListener(v -> {
@@ -255,39 +258,66 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
             long classStartMillis = startDate.getTime();
 
-            // 10 minutes before class
             long startsSoonMillis = classStartMillis - (10 * 60 * 1000);
-
-            // 30 minutes after class start
             long attendanceReminderMillis = classStartMillis + (30 * 60 * 1000);
 
             int startsSoonId = Math.abs((sessionId + "_soon").hashCode());
             int attendanceReminderId = Math.abs((sessionId + "_attendance").hashCode());
 
-            String classTitle = courseCode + " starts soon";
-            String classMessage = sessionTitle + " at " + roomName + " starts in 10 minutes.";
-
-            String attendanceTitle = "Attendance reminder";
-            String attendanceMessage = "Have you submitted your attendance for " + courseCode + "?";
-
             NotificationHelper.scheduleNotification(
                     this,
                     startsSoonMillis,
-                    classTitle,
-                    classMessage,
+                    courseCode + " starts soon",
+                    sessionTitle + " at " + roomName + " starts in 10 minutes.",
                     startsSoonId
             );
 
             NotificationHelper.scheduleNotification(
                     this,
                     attendanceReminderMillis,
-                    attendanceTitle,
-                    attendanceMessage,
+                    "Attendance reminder",
+                    "Have you submitted your attendance for " + courseCode + "?",
                     attendanceReminderId
             );
 
         } catch (Exception e) {
             Toast.makeText(this, "Failed to schedule notification", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class SessionAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return sessionDisplayList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return sessionDisplayList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(StudentDashboardActivity.this)
+                        .inflate(R.layout.item_session, parent, false);
+            }
+
+            TextView sessionText = convertView.findViewById(R.id.sessionText);
+            TextView sessionMenuButton = convertView.findViewById(R.id.sessionMenuButton);
+
+            sessionText.setText(sessionDisplayList.get(position));
+
+            // Student side does not need 3-dot menu
+            sessionMenuButton.setVisibility(View.GONE);
+
+            return convertView;
         }
     }
 }

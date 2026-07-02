@@ -27,7 +27,7 @@ public class RegisterActivity extends AppCompatActivity {
     EditText nameInput, emailInput, passwordInput, phoneInput, studentIdInput, staffIdInput;
     RadioGroup roleGroup;
     RadioButton studentRadio, lecturerRadio;
-    Button createAccountButton, backLoginButton;
+    Button createAccountButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +55,6 @@ public class RegisterActivity extends AppCompatActivity {
         lecturerRadio = findViewById(R.id.lecturerRadio);
 
         createAccountButton = findViewById(R.id.createAccountButton);
-        backLoginButton = findViewById(R.id.backLoginButton);
 
         roleGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.studentRadio) {
@@ -65,10 +64,6 @@ public class RegisterActivity extends AppCompatActivity {
                 studentIdInput.setVisibility(View.GONE);
                 staffIdInput.setVisibility(View.VISIBLE);
             }
-        });
-
-        backLoginButton.setOnClickListener(v -> {
-            finish();
         });
 
         createAccountButton.setOnClickListener(v -> {

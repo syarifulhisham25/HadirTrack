@@ -4,69 +4,133 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp"
-    android:background="#F8F6FF">
+    android:background="@drawable/bg_app_gradient">
 
-    <TextView
-        android:id="@+id/courseTitleText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Manage Students"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:textColor="#2D2363"
-        android:layout_marginBottom="8dp" />
-
-    <TextView
-        android:id="@+id/courseSubtitleText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add students to this course"
-        android:textSize="16sp"
-        android:textColor="#666666"
-        android:layout_marginBottom="24dp" />
-
-    <EditText
-        android:id="@+id/studentSearchInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter student ID or email"
-        android:padding="14dp"
-        android:background="@android:drawable/edit_text"
-        android:layout_marginBottom="12dp" />
-
-    <Button
-        android:id="@+id/addStudentButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add Student"
-        android:padding="12dp"
-        android:layout_marginBottom="24dp" />
-
-    <TextView
-        android:id="@+id/enrolledTitleText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Enrolled Students"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#2D2363"
-        android:layout_marginBottom="12dp" />
-
-    <ListView
-        android:id="@+id/studentListView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="12dp" />
+        android:orientation="vertical"
+        android:padding="22dp">
 
-    <Button
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="18dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/courseTitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manage Students"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="#2D2363" />
+
+                <TextView
+                    android:id="@+id/courseSubtitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Course info"
+                    android:textSize="14sp"
+                    android:textColor="#666666" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Add Student Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
+            android:padding="18dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add Student"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D2363"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Search student by Student ID or email, then enroll them into this course."
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:lineSpacingExtra="3dp"
+                android:layout_marginBottom="14dp" />
+
+            <EditText
+                android:id="@+id/studentSearchInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Student ID or email"
+                android:padding="14dp"
+                android:background="@drawable/bg_input"
+                android:textColor="#1E1E1E"
+                android:textColorHint="#999999"
+                android:inputType="text"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/addStudentButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="Add Student"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_primary" />
+
+        </LinearLayout>
+
+        <!-- Student List Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enrolled Students"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#2D2363"
+            android:layout_marginBottom="10dp" />
+
+        <ListView
+            android:id="@+id/studentListView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="12dp"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp" />
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/backButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="54dp"
         android:text="Back"
-        android:padding="12dp"
-        android:layout_marginTop="12dp" />
+        android:textColor="#2D2363"
+        android:textStyle="bold"
+        android:background="@drawable/bg_button_secondary"
+        android:layout_marginStart="22dp"
+        android:layout_marginEnd="22dp"
+        android:layout_marginBottom="22dp" />
 
 </LinearLayout>
