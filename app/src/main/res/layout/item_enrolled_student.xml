@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="16dp"
+    android:background="@drawable/bg_card"
+    android:elevation="2dp">
+
+    <TextView
+        android:id="@+id/studentText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Student Info"
+        android:textSize="16sp"
+        android:lineSpacingExtra="3dp"
+        android:textColor="#1E1E1E" />
+
+    <TextView
+        android:id="@+id/studentMenuButton"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:gravity="center"
+        android:text="⋮"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#2D2363" />
+
+</LinearLayout>

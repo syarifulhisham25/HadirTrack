@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_app_gradient">
+
+    <!-- Search Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@drawable/bg_card"
+        android:elevation="4dp"
+        android:layout_margin="14dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pick Class Location"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#2D2363"
+            android:layout_marginBottom="6dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Search or tap on the map to select the class location."
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="12dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/searchLocationInput"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:hint="Search location"
+                android:singleLine="true"
+                android:padding="14dp"
+                android:background="@drawable/bg_input"
+                android:textColor="#1E1E1E"
+                android:textColorHint="#999999"
+                android:inputType="text" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/searchLocationButton"
+                android:layout_width="105dp"
+                android:layout_height="50dp"
+                android:text="Search"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_primary" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Map -->
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Bottom Location Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="10dp">
+
+        <TextView
+            android:id="@+id/selectedLocationText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tap on map to select location"
+            android:textSize="15sp"
+            android:textColor="#333333"
+            android:lineSpacingExtra="3dp"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/confirmLocationButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Confirm Location"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button_primary" />
+
+    </LinearLayout>
+
+</LinearLayout>

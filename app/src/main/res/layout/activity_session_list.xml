@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_app_gradient">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="22dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="18dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/courseTitleText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Course Sessions"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="#2D2363" />
+
+                <TextView
+                    android:id="@+id/courseSubtitleText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Manage class sessions"
+                    android:textSize="14sp"
+                    android:textColor="#666666" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Action Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
+            android:padding="18dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Session Actions"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D2363"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add sessions or manage students enrolled in this course."
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:lineSpacingExtra="3dp"
+                android:layout_marginBottom="14dp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/manageStudentsButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="Manage Students"
+                android:textColor="#2D2363"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_secondary"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/addSessionButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="Add Session"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_primary" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sessions"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#2D2363"
+            android:layout_marginBottom="10dp" />
+
+        <ListView
+            android:id="@+id/sessionListView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="12dp"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
