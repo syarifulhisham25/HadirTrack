@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@drawable/bg_app_gradient">
+    android:background="@drawable/bg_student_gradient">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,7 +34,7 @@
                     android:text="Course Title"
                     android:textSize="26sp"
                     android:textStyle="bold"
-                    android:textColor="#2D2363" />
+                    android:textColor="#1B4332" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
                 android:text="Session Information"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#2D2363"
+                android:textColor="#1B4332"
                 android:layout_marginBottom="10dp" />
 
             <TextView
@@ -92,7 +92,7 @@
                 android:text="Class Remark"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#2D2363"
+                android:textColor="#1B4332"
                 android:layout_marginBottom="8dp" />
 
             <TextView
@@ -111,7 +111,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/bg_card"
+            android:background="@drawable/bg_student_card"
             android:elevation="3dp"
             android:padding="18dp"
             android:layout_marginBottom="16dp">
@@ -123,7 +123,7 @@
                 android:text="Class Images"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#2D2363"
+                android:textColor="#1B4332"
                 android:layout_marginBottom="6dp" />
 
             <TextView
@@ -169,7 +169,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/bg_card"
+            android:background="@drawable/bg_student_card"
             android:elevation="3dp"
             android:padding="18dp"
             android:layout_marginBottom="16dp">
@@ -180,7 +180,7 @@
                 android:text="Attendance"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#2D2363"
+                android:textColor="#1B4332"
                 android:layout_marginBottom="10dp" />
 
             <TextView
@@ -198,9 +198,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:text="Open Class Location"
-                android:textColor="#2D2363"
+                android:textColor="#1B4332"
                 android:textStyle="bold"
-                android:background="@drawable/bg_button_secondary"
+                android:background="@drawable/bg_student_secondary"
                 android:layout_marginBottom="10dp" />
 
             <Button
@@ -210,7 +210,7 @@
                 android:text="Check In"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
-                android:background="@drawable/bg_button_primary" />
+                android:background="@drawable/bg_student_primary" />
 
         </LinearLayout>
 
@@ -219,9 +219,9 @@
             android:layout_width="match_parent"
             android:layout_height="54dp"
             android:text="Back"
-            android:textColor="#2D2363"
+            android:textColor="#1B4332"
             android:textStyle="bold"
-            android:background="@drawable/bg_button_secondary"
+            android:background="@drawable/bg_student_secondary"
             android:layout_marginBottom="24dp" />
 
     </LinearLayout>
