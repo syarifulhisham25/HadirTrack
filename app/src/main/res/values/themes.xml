@@ -11,7 +11,7 @@
     <!-- Splash screen theme -->
     <style name="Theme.HadirTrack.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#EEE8FF</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/hadirtrack_splash_icon</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/hadirtrack_logo</item>
         <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
         <item name="postSplashScreenTheme">@style/Theme.HadirTrack</item>
     </style>
