@@ -67,6 +67,7 @@ public class LecturerDashboardActivity extends AppCompatActivity {
 
         profileButton.setOnClickListener(v -> {
             Intent intent = new Intent(LecturerDashboardActivity.this, ProfileActivity.class);
+            intent.putExtra("role", "lecturer");
             startActivity(intent);
         });
 

@@ -80,13 +80,13 @@
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"
-            android:background="@drawable/bg_button_secondary"
+            android:background="@drawable/bg_student_secondary"
             android:padding="6dp">
 
             <ImageView
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/ic_sessions"
+                android:src="@drawable/ic_sessions_student"
                 android:contentDescription="Sessions"
                 android:layout_marginBottom="4dp" />
 
@@ -116,7 +116,7 @@
             <ImageView
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/ic_profile"
+                android:src="@drawable/ic_profile_student"
                 android:contentDescription="Profile"
                 android:layout_marginBottom="4dp" />
 
