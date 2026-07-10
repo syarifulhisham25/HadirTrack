@@ -94,6 +94,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
         profileButton.setOnClickListener(v -> {
             Intent intent = new Intent(StudentDashboardActivity.this, ProfileActivity.class);
+            intent.putExtra("role", "student");
             startActivity(intent);
         });
 

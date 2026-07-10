@@ -1,6 +1,7 @@
 package com.example.hadirtrack;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,7 +32,19 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        role = getIntent().getStringExtra("role");
+
+        Log.d("PROFILE_DEBUG", "Role from Intent: " + role);
+
+        if ("student".equalsIgnoreCase(role)) {
+            setContentView(R.layout.activity_profile_student);
+        } else if ("lecturer".equalsIgnoreCase(role)) {
+            setContentView(R.layout.activity_profile);
+        } else {
+            Toast.makeText(this, "Role not received", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
