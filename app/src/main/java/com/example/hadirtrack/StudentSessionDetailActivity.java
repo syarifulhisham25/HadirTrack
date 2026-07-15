@@ -16,6 +16,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -32,6 +33,7 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
     TextView courseTitleText, sessionInfoText, attendanceStatusText, classRemarkText, classImagesTitleText;
     Button openMapButton, checkInButton, backButton;
     ImageView classImage1View, classImage2View, classImage3View;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     FirebaseFirestore db;
     FirebaseAuth auth;
@@ -66,6 +68,7 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
         classImage1View = findViewById(R.id.classImage1View);
         classImage2View = findViewById(R.id.classImage2View);
         classImage3View = findViewById(R.id.classImage3View);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
         sessionId = getIntent().getStringExtra("sessionId");
         courseId = getIntent().getStringExtra("courseId");
@@ -88,6 +91,11 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
 
         openMapButton.setOnClickListener(v -> openClassLocationInMap());
         checkInButton.setOnClickListener(v -> checkLocationPermission());
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            loadSessionDetails();
+            checkEnrollmentAndAttendanceStatus();
+        });
     }
 
     @Override
@@ -141,6 +149,7 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
                 .document(attendanceDocId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
+                    if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                     if (documentSnapshot.exists()) {
                         attendanceStatusText.setText("Attendance Status: Submitted");
                         attendanceStatusText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
@@ -156,6 +165,7 @@ public class StudentSessionDetailActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> {
+                    if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                     attendanceStatusText.setText("Attendance Status: Failed to check");
                     attendanceStatusText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
 

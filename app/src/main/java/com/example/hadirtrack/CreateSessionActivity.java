@@ -741,44 +741,17 @@ public class CreateSessionActivity extends AppCompatActivity {
                 if (remainingUrls.isEmpty()) {
                     Toast.makeText(this, "At least 1 class image is required", Toast.LENGTH_SHORT).show();
                     saveSessionButton.setEnabled(true);
-                    saveSessionButton.setText("Update Session");
                     return;
                 }
-
-                updateSession(
-                        sessionTitle,
-                        locationName,
-                        roomName,
-                        latitude,
-                        longitude,
-                        radiusMeter,
-                        startTime,
-                        endTime,
-                        classRemark,
-                        remainingUrls
-                );
+                updateSession(sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime, classRemark, remainingUrls);
             } else {
                 Toast.makeText(this, "Please capture at least 1 class image", Toast.LENGTH_SHORT).show();
                 saveSessionButton.setEnabled(true);
-                saveSessionButton.setText("Save Session");
             }
             return;
         }
 
-        uploadImageAtIndex(
-                imageBitmaps,
-                uploadedUrls,
-                0,
-                sessionTitle,
-                locationName,
-                roomName,
-                latitude,
-                longitude,
-                radiusMeter,
-                startTime,
-                endTime,
-                classRemark
-        );
+        uploadImageAtIndex(imageBitmaps, uploadedUrls, 0, sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime, classRemark);
     }
 
     private void uploadImageAtIndex(
@@ -799,33 +772,7 @@ public class CreateSessionActivity extends AppCompatActivity {
             if (isEditMode) {
                 ArrayList<String> finalUrls = getRemainingExistingImageUrls();
                 finalUrls.addAll(uploadedUrls);
-
-                if (finalUrls.size() > 3) {
-                    Toast.makeText(this, "Maximum 3 class images only. Remove old image first.", Toast.LENGTH_LONG).show();
-                    saveSessionButton.setEnabled(true);
-                    saveSessionButton.setText("Update Session");
-                    return;
-                }
-
-                if (finalUrls.isEmpty()) {
-                    Toast.makeText(this, "At least 1 class image is required", Toast.LENGTH_SHORT).show();
-                    saveSessionButton.setEnabled(true);
-                    saveSessionButton.setText("Update Session");
-                    return;
-                }
-
-                updateSession(
-                        sessionTitle,
-                        locationName,
-                        roomName,
-                        latitude,
-                        longitude,
-                        radiusMeter,
-                        startTime,
-                        endTime,
-                        classRemark,
-                        finalUrls
-                );
+                updateSession(sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime, classRemark, finalUrls);
             } else {
                 saveSession(sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime, classRemark, uploadedUrls);
             }
@@ -833,46 +780,23 @@ public class CreateSessionActivity extends AppCompatActivity {
         }
 
         Bitmap bitmap = imageBitmaps.get(index);
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
         byte[] imageData = baos.toByteArray();
 
-        String fileName = "class_images/" + courseId + "/" + System.currentTimeMillis() + "_" + (index + 1) + ".jpg";
-
+        String fileName = "class_images/" + System.currentTimeMillis() + "_" + index + ".jpg";
         StorageReference imageRef = storage.getReference().child(fileName);
 
         imageRef.putBytes(imageData)
                 .addOnSuccessListener(taskSnapshot -> {
-                    imageRef.getDownloadUrl()
-                            .addOnSuccessListener(uri -> {
-                                uploadedUrls.add(uri.toString());
-
-                                uploadImageAtIndex(
-                                        imageBitmaps,
-                                        uploadedUrls,
-                                        index + 1,
-                                        sessionTitle,
-                                        locationName,
-                                        roomName,
-                                        latitude,
-                                        longitude,
-                                        radiusMeter,
-                                        startTime,
-                                        endTime,
-                                        classRemark
-                                );
-                            })
-                            .addOnFailureListener(e -> {
-                                saveSessionButton.setEnabled(true);
-                                saveSessionButton.setText(isEditMode ? "Update Session" : "Save Session");
-                                Toast.makeText(this, "Failed to get image URL: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            });
+                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        uploadedUrls.add(uri.toString());
+                        uploadImageAtIndex(imageBitmaps, uploadedUrls, index + 1, sessionTitle, locationName, roomName, latitude, longitude, radiusMeter, startTime, endTime, classRemark);
+                    });
                 })
                 .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     saveSessionButton.setEnabled(true);
-                    saveSessionButton.setText(isEditMode ? "Update Session" : "Save Session");
-                    Toast.makeText(this, "Failed to upload image: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
 

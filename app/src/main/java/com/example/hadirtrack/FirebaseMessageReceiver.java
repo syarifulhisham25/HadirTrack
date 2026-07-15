@@ -1,5 +1,6 @@
 package com.example.hadirtrack;
 
+import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,18 +17,31 @@ import androidx.core.app.NotificationCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.List;
+
 public class FirebaseMessageReceiver extends FirebaseMessagingService {
 
     private static final String TAG = "FirebaseMessageReceiver";
-    public static final String CHANNEL_ID = "fcm_notification_channel";
+    public static final String CHANNEL_ID = "hadirtrack_urgent_channel";
 
     @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
         Log.d(TAG, "FCM Token: " + token);
 
-        // Level 1: no need save token yet.
-        // Level 2 nanti baru kita save token to Firestore for targeted push.
+        updateTokenInFirestore(token);
+    }
+
+    private void updateTokenInFirestore(String token) {
+        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(user.getUid())
+                    .update("fcmToken", token)
+                    .addOnSuccessListener(aVoid -> Log.d(TAG, "Token updated successfully"))
+                    .addOnFailureListener(e -> Log.e(TAG, "Error updating token", e));
+        }
     }
 
     @Override
@@ -41,30 +55,28 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
             if (remoteMessage.getNotification().getTitle() != null) {
                 title = remoteMessage.getNotification().getTitle();
             }
-
             if (remoteMessage.getNotification().getBody() != null) {
                 message = remoteMessage.getNotification().getBody();
             }
+        } else if (remoteMessage.getData().size() > 0) {
+            title = remoteMessage.getData().getOrDefault("title", title);
+            message = remoteMessage.getData().getOrDefault("body", message);
         }
 
-        if (remoteMessage.getData().size() > 0) {
-            if (remoteMessage.getData().get("title") != null) {
-                title = remoteMessage.getData().get("title");
-            }
-
-            if (remoteMessage.getData().get("body") != null) {
-                message = remoteMessage.getData().get("body");
-            }
-        }
-
-        showNotification(title, message);
+        showNotification(title, message, remoteMessage.getData());
     }
 
-    private void showNotification(String title, String message) {
+    private void showNotification(String title, String message, java.util.Map<String, String> data) {
         createNotificationChannel();
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent("OPEN_LECTURER_DASHBOARD");
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        
+        if (data != null) {
+            for (java.util.Map.Entry<String, String> entry : data.entrySet()) {
+                intent.putExtra(entry.getKey(), entry.getValue());
+            }
+        }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this,
@@ -79,8 +91,9 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                 .setContentText(message)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =
@@ -91,10 +104,29 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
             notificationManager.notify(notificationId, builder.build());
         }
 
-        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        if (vibrator != null) {
-            vibrator.vibrate(500);
+        // Only vibrate if the app is in the background
+        if (!isAppInForeground()) {
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null) {
+                vibrator.vibrate(500);
+            }
         }
+    }
+
+    private boolean isAppInForeground() {
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        if (appProcesses == null) {
+            return false;
+        }
+        final String packageName = getPackageName();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+                    && appProcess.processName.equals(packageName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void createNotificationChannel() {
