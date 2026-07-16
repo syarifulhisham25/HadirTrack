@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize Firebase App Check
         FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
         firebaseAppCheck.installAppCheckProviderFactory(
                 PlayIntegrityAppCheckProviderFactory.getInstance());
@@ -69,9 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> {
                     if (isGranted) {
-                        Log.d("FCM", "Notification permission granted");
                     } else {
-                        Log.d("FCM", "Notification permission denied");
                     }
                 }
         );
@@ -80,10 +77,8 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseMessaging.getInstance().getToken()
                 .addOnSuccessListener(token -> {
-                    Log.d("FCM", "Current FCM Token: " + token);
                 })
                 .addOnFailureListener(e -> {
-                    Log.d("FCM", "Failed to get FCM token: " + e.getMessage());
                 });
 
         registerButton.setOnClickListener(v -> {
@@ -95,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
             loginUser();
         });
 
-        // Check if user is already logged in
         if (auth.getCurrentUser() != null) {
             checkUserRoleAndRedirect(auth.getCurrentUser().getUid());
         }
@@ -168,8 +162,10 @@ public class MainActivity extends AppCompatActivity {
                 .addOnSuccessListener(token -> {
                     db.collection("users").document(userId)
                             .update("fcmToken", token)
-                            .addOnSuccessListener(aVoid -> Log.d("FCM", "Token updated on login"))
-                            .addOnFailureListener(e -> Log.e("FCM", "Failed to update token", e));
+                            .addOnSuccessListener(aVoid -> {
+                            })
+                            .addOnFailureListener(e -> {
+                            });
                 });
     }
 
