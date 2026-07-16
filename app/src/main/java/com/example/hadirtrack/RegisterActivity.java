@@ -1,5 +1,6 @@
 package com.example.hadirtrack;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -149,8 +151,20 @@ public class RegisterActivity extends AppCompatActivity {
                             .document(userId)
                             .set(user)
                             .addOnSuccessListener(unused -> {
-                                Toast.makeText(RegisterActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
-                                finish();
+                                // Update FCM token before redirecting
+                                FirebaseMessaging.getInstance().getToken()
+                                        .addOnSuccessListener(token -> {
+                                            db.collection("users").document(userId)
+                                                    .update("fcmToken", token)
+                                                    .addOnCompleteListener(task -> {
+                                                        // Redirect regardless of token update success
+                                                        goToDashboard(role);
+                                                    });
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            // Redirect even if token fetch fails
+                                            goToDashboard(role);
+                                        });
                             })
                             .addOnFailureListener(e -> {
                                 createAccountButton.setEnabled(true);
@@ -164,5 +178,18 @@ public class RegisterActivity extends AppCompatActivity {
                     createAccountButton.setText("Create Account");
                     Toast.makeText(RegisterActivity.this, "Register failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
+    }
+
+    private void goToDashboard(String role) {
+        Toast.makeText(RegisterActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
+        Intent intent;
+        if ("lecturer".equals(role)) {
+            intent = new Intent(RegisterActivity.this, LecturerDashboardActivity.class);
+        } else {
+            intent = new Intent(RegisterActivity.this, StudentDashboardActivity.class);
+        }
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }
