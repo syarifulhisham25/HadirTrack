@@ -3,10 +3,7 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-/**
- * Triggers when a new document is created in 'notifications' collection.
- * Uses Firebase Functions v2 syntax.
- */
+
 exports.sendCheckInNotification = onDocumentCreated(
     "notifications/{notificationId}",
     async (event) => {
@@ -22,7 +19,6 @@ exports.sendCheckInNotification = onDocumentCreated(
       const message = data.message;
 
       try {
-        // 1. Get the lecturer's FCM token from the 'users' collection
         const userDoc = await admin.firestore()
             .collection("users")
             .doc(lecturerId)
@@ -40,7 +36,6 @@ exports.sendCheckInNotification = onDocumentCreated(
           return null;
         }
 
-        // 2. Construct the FCM HTTP v1 Message
         const payload = {
           token: fcmToken,
           notification: {
@@ -67,7 +62,6 @@ exports.sendCheckInNotification = onDocumentCreated(
           },
         };
 
-        // 3. Send the notification via FCM HTTP v1
         const response = await admin.messaging().send(payload);
         console.log("Successfully sent message:", response);
         return response;
