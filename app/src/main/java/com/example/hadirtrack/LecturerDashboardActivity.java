@@ -14,9 +14,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ public class LecturerDashboardActivity extends AppCompatActivity {
 
     Button addCourseButton;
     ListView courseListView;
+    SwipeRefreshLayout swipeRefreshLayout;
     View coursesTab, profileButton, logoutButton;
 
     FirebaseAuth auth;
@@ -49,6 +53,7 @@ public class LecturerDashboardActivity extends AppCompatActivity {
 
         addCourseButton = findViewById(R.id.addCourseButton);
         courseListView = findViewById(R.id.courseListView);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         coursesTab = findViewById(R.id.coursesTab);
         profileButton = findViewById(R.id.profileButton);
         logoutButton = findViewById(R.id.logoutButton);
@@ -79,6 +84,35 @@ public class LecturerDashboardActivity extends AppCompatActivity {
         });
 
         courseListView.setOnItemClickListener((parent, view, position, id) -> openCourse(position));
+
+        swipeRefreshLayout.setOnRefreshListener(this::loadCourses);
+
+        handleNotificationIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleNotificationIntent(intent);
+    }
+
+    private void handleNotificationIntent(Intent intent) {
+        if (intent != null && intent.hasExtra("sessionId")) {
+            String sessionId = intent.getStringExtra("sessionId");
+            String courseId = intent.getStringExtra("courseId");
+            String courseCode = intent.getStringExtra("courseCode");
+            String courseName = intent.getStringExtra("courseName");
+
+            if (sessionId != null && !sessionId.isEmpty()) {
+                Intent attendIntent = new Intent(this, AttendanceListActivity.class);
+                attendIntent.putExtra("sessionId", sessionId);
+                attendIntent.putExtra("courseId", courseId);
+                attendIntent.putExtra("courseCode", courseCode);
+                attendIntent.putExtra("courseName", courseName);
+                startActivity(attendIntent);
+            }
+        }
     }
 
     @Override
@@ -89,6 +123,7 @@ public class LecturerDashboardActivity extends AppCompatActivity {
 
     private void loadCourses() {
         if (auth.getCurrentUser() == null) {
+            if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
             return;
         }
 
@@ -98,6 +133,7 @@ public class LecturerDashboardActivity extends AppCompatActivity {
                 .whereEqualTo("lecturerId", lecturerId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                     courseIdList.clear();
                     courseCodeList.clear();
                     courseNameList.clear();
@@ -134,6 +170,7 @@ public class LecturerDashboardActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
+                    if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                     Toast.makeText(this, "Failed to load courses: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }

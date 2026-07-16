@@ -21,6 +21,13 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.appcheck.FirebaseAppCheck;
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.media.AudioAttributes;
+import android.net.Uri;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,8 +44,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Initialize Firebase App Check
+        FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
+        firebaseAppCheck.installAppCheckProviderFactory(
+                PlayIntegrityAppCheckProviderFactory.getInstance());
+
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        createNotificationChannel();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -80,6 +94,61 @@ public class MainActivity extends AppCompatActivity {
         loginButton.setOnClickListener(v -> {
             loginUser();
         });
+
+        // Check if user is already logged in
+        if (auth.getCurrentUser() != null) {
+            checkUserRoleAndRedirect(auth.getCurrentUser().getUid());
+        }
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = "hadirtrack_urgent_channel";
+            String channelName = "Urgent Notifications";
+            String channelDescription = "Critical alerts for attendance";
+
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    channelName,
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+
+            channel.setDescription(channelDescription);
+            channel.enableLights(true);
+            channel.enableVibration(true);
+            channel.setLockscreenVisibility(android.app.Notification.VISIBILITY_PUBLIC);
+
+            Uri soundUri = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+            channel.setSound(soundUri, audioAttributes);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+
+    private void checkUserRoleAndRedirect(String userId) {
+        db.collection("users").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String role = documentSnapshot.getString("role");
+                        updateFCMToken(userId); // Ensure token is fresh
+
+                        Intent intent;
+                        if ("lecturer".equals(role)) {
+                            intent = new Intent(MainActivity.this, LecturerDashboardActivity.class);
+                        } else {
+                            intent = new Intent(MainActivity.this, StudentDashboardActivity.class);
+                        }
+                        startActivity(intent);
+                        finish();
+                    }
+                });
     }
 
     private void requestNotificationPermissionIfNeeded() {
@@ -92,6 +161,16 @@ public class MainActivity extends AppCompatActivity {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         }
+    }
+
+    private void updateFCMToken(String userId) {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnSuccessListener(token -> {
+                    db.collection("users").document(userId)
+                            .update("fcmToken", token)
+                            .addOnSuccessListener(aVoid -> Log.d("FCM", "Token updated on login"))
+                            .addOnFailureListener(e -> Log.e("FCM", "Failed to update token", e));
+                });
     }
 
     private void loginUser() {
@@ -124,10 +203,12 @@ public class MainActivity extends AppCompatActivity {
                                     String role = documentSnapshot.getString("role");
 
                                     if ("lecturer".equals(role)) {
+                                        updateFCMToken(userId);
                                         Intent intent = new Intent(MainActivity.this, LecturerDashboardActivity.class);
                                         startActivity(intent);
                                         finish();
                                     } else if ("student".equals(role)) {
+                                        updateFCMToken(userId);
                                         Intent intent = new Intent(MainActivity.this, StudentDashboardActivity.class);
                                         startActivity(intent);
                                         finish();

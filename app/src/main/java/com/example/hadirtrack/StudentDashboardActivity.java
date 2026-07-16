@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,6 +31,7 @@ import java.util.Locale;
 public class StudentDashboardActivity extends AppCompatActivity {
 
     ListView studentSessionListView;
+    SwipeRefreshLayout swipeRefreshLayout;
     View sessionsTab, profileButton, logoutButton;
 
     ActivityResultLauncher<String> notificationPermissionLauncher;
@@ -70,6 +72,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         requestNotificationPermissionIfNeeded();
 
         studentSessionListView = findViewById(R.id.studentSessionListView);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         sessionsTab = findViewById(R.id.sessionsTab);
         profileButton = findViewById(R.id.profileButton);
         logoutButton = findViewById(R.id.logoutButton);
@@ -104,6 +107,8 @@ public class StudentDashboardActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+
+        swipeRefreshLayout.setOnRefreshListener(this::loadEnrolledCourses);
     }
 
     private void requestNotificationPermissionIfNeeded() {
@@ -126,6 +131,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
     private void loadEnrolledCourses() {
         if (auth.getCurrentUser() == null) {
+            if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
             return;
         }
 
@@ -142,6 +148,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.isEmpty()) {
+                        if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                         sessionDisplayList.add("You are not enrolled in any course yet");
                         adapter.notifyDataSetChanged();
                         return;
@@ -156,6 +163,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
                     }
 
                     if (enrolledCourseIdList.isEmpty()) {
+                        if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                         sessionDisplayList.add("You are not enrolled in any course yet");
                         adapter.notifyDataSetChanged();
                         return;
@@ -164,6 +172,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
                     loadSessionsForEnrolledCourses();
                 })
                 .addOnFailureListener(e -> {
+                    if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                     Toast.makeText(this, "Failed to load enrolled courses: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
@@ -221,6 +230,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
     private void checkIfAllCoursesLoaded() {
         if (coursesLoadedCount >= totalCoursesToLoad) {
+            if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
             if (sessionDisplayList.isEmpty()) {
                 sessionDisplayList.add("No active sessions for your enrolled courses");
             }

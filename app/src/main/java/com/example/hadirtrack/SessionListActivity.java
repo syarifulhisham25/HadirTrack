@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -27,6 +28,7 @@ public class SessionListActivity extends AppCompatActivity {
     TextView courseTitleText, courseSubtitleText;
     Button manageStudentsButton, addSessionButton;
     ListView sessionListView;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     FirebaseFirestore db;
 
@@ -48,6 +50,7 @@ public class SessionListActivity extends AppCompatActivity {
         courseSubtitleText = findViewById(R.id.courseSubtitleText);
         addSessionButton = findViewById(R.id.addSessionButton);
         sessionListView = findViewById(R.id.sessionListView);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         manageStudentsButton = findViewById(R.id.manageStudentsButton);
 
         courseId = getIntent().getStringExtra("courseId");
@@ -83,6 +86,8 @@ public class SessionListActivity extends AppCompatActivity {
 
             openSession(position);
         });
+
+        swipeRefreshLayout.setOnRefreshListener(this::loadSessions);
     }
 
     @Override
@@ -96,6 +101,7 @@ public class SessionListActivity extends AppCompatActivity {
                 .whereEqualTo("courseId", courseId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                     sessionDisplayList.clear();
                     sessionIdList.clear();
 
@@ -128,6 +134,7 @@ public class SessionListActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
+                    if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                     Toast.makeText(this, "Failed to load sessions: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }

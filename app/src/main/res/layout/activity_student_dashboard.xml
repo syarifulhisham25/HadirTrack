@@ -47,15 +47,22 @@
             </LinearLayout>
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/studentSessionListView"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="12dp"
-            android:clipToPadding="false"
-            android:paddingBottom="8dp" />
+            android:layout_weight="1">
+
+            <ListView
+                android:id="@+id/studentSessionListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="12dp"
+                android:clipToPadding="false"
+                android:paddingBottom="8dp" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </LinearLayout>
 

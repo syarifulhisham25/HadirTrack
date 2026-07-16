@@ -1,228 +1,234 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     android:background="@drawable/bg_student_gradient">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="22dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="18dp">
+            android:orientation="vertical"
+            android:padding="22dp">
 
+            <!-- Header -->
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="18dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/courseTitleText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Course Title"
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:textColor="#1B4332" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Session details and attendance check-in"
+                        android:textSize="14sp"
+                        android:textColor="#666666" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Session Info Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:elevation="3dp"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
 
                 <TextView
-                    android:id="@+id/courseTitleText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Course Title"
-                    android:textSize="26sp"
+                    android:text="Session Information"
+                    android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#1B4332" />
+                    android:textColor="#1B4332"
+                    android:layout_marginBottom="10dp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/sessionInfoText"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Session details and attendance check-in"
-                    android:textSize="14sp"
-                    android:textColor="#666666" />
+                    android:text="Session Info"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="4dp"
+                    android:textColor="#333333" />
 
             </LinearLayout>
-        </LinearLayout>
 
-        <!-- Session Info Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:elevation="3dp"
-            android:padding="18dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
+            <!-- Remark Card -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Session Information"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#1B4332"
-                android:layout_marginBottom="10dp" />
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:elevation="3dp"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
 
-            <TextView
-                android:id="@+id/sessionInfoText"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Class Remark"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#1B4332"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/classRemarkText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Remark: -"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="3dp"
+                    android:textColor="#333333" />
+
+            </LinearLayout>
+
+            <!-- Class Images Card -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Session Info"
-                android:textSize="15sp"
-                android:lineSpacingExtra="4dp"
-                android:textColor="#333333" />
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:elevation="3dp"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/classImagesTitleText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Class Images"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#1B4332"
+                    android:layout_marginBottom="6dp" />
 
-        <!-- Remark Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:elevation="3dp"
-            android:padding="18dp"
-            android:layout_marginBottom="16dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tap image to view full screen."
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:layout_marginBottom="12dp" />
 
-            <TextView
+                <ImageView
+                    android:id="@+id/classImage1View"
+                    android:layout_width="match_parent"
+                    android:layout_height="190dp"
+                    android:background="#DDF4E1"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Class image 1"
+                    android:layout_marginBottom="12dp" />
+
+                <ImageView
+                    android:id="@+id/classImage2View"
+                    android:layout_width="match_parent"
+                    android:layout_height="190dp"
+                    android:background="#E7DEFF"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Class image 2"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/classImage3View"
+                    android:layout_width="match_parent"
+                    android:layout_height="190dp"
+                    android:background="#E7DEFF"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Class image 3"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <!-- Attendance Card -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Class Remark"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#1B4332"
-                android:layout_marginBottom="8dp" />
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:elevation="3dp"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
 
-            <TextView
-                android:id="@+id/classRemarkText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Remark: -"
-                android:textSize="15sp"
-                android:lineSpacingExtra="3dp"
-                android:textColor="#333333" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Attendance"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#1B4332"
+                    android:layout_marginBottom="10dp" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/attendanceStatusText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Attendance Status: Not submitted"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="14dp" />
 
-        <!-- Class Images Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:elevation="3dp"
-            android:padding="18dp"
-            android:layout_marginBottom="16dp">
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/openMapButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Open Class Location"
+                    android:textColor="#1B4332"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_student_secondary"
+                    android:layout_marginBottom="10dp" />
 
-            <TextView
-                android:id="@+id/classImagesTitleText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Class Images"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#1B4332"
-                android:layout_marginBottom="6dp" />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/checkInButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Check In"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_student_primary" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tap image to view full screen."
-                android:textSize="14sp"
-                android:textColor="#666666"
-                android:layout_marginBottom="12dp" />
-
-            <ImageView
-                android:id="@+id/classImage1View"
-                android:layout_width="match_parent"
-                android:layout_height="190dp"
-                android:background="#DDF4E1"
-                android:scaleType="centerCrop"
-                android:contentDescription="Class image 1"
-                android:layout_marginBottom="12dp" />
-
-            <ImageView
-                android:id="@+id/classImage2View"
-                android:layout_width="match_parent"
-                android:layout_height="190dp"
-                android:background="#E7DEFF"
-                android:scaleType="centerCrop"
-                android:contentDescription="Class image 2"
-                android:layout_marginBottom="12dp"
-                android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/classImage3View"
-                android:layout_width="match_parent"
-                android:layout_height="190dp"
-                android:background="#E7DEFF"
-                android:scaleType="centerCrop"
-                android:contentDescription="Class image 3"
-                android:visibility="gone" />
-
-        </LinearLayout>
-
-        <!-- Attendance Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:elevation="3dp"
-            android:padding="18dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Attendance"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#1B4332"
-                android:layout_marginBottom="10dp" />
-
-            <TextView
-                android:id="@+id/attendanceStatusText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Attendance Status: Not submitted"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:layout_marginBottom="14dp" />
+            </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/openMapButton"
+                android:id="@+id/backButton"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:text="Open Class Location"
+                android:layout_height="54dp"
+                android:text="Back"
                 android:textColor="#1B4332"
                 android:textStyle="bold"
                 android:background="@drawable/bg_student_secondary"
-                android:layout_marginBottom="10dp" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/checkInButton"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:text="Check In"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:background="@drawable/bg_student_primary" />
+                android:layout_marginBottom="24dp" />
 
         </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/backButton"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:text="Back"
-            android:textColor="#1B4332"
-            android:textStyle="bold"
-            android:background="@drawable/bg_student_secondary"
-            android:layout_marginBottom="24dp" />
-
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

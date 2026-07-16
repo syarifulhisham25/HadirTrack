@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.util.Log;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -213,6 +215,43 @@ public class SelfieActivity extends AppCompatActivity {
                 });
     }
 
+    private void getLecturerIdAndNotify(String studentName) {
+        db.collection("courses").document(courseId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String lecturerId = documentSnapshot.getString("lecturerId");
+                        String courseCode = documentSnapshot.getString("courseCode");
+                        String courseName = documentSnapshot.getString("courseName");
+                        if (lecturerId != null) {
+                            fetchLecturerTokenAndNotify(lecturerId, studentName, courseCode, courseName);
+                        }
+                    }
+                });
+    }
+
+    private void fetchLecturerTokenAndNotify(String lecturerId, String studentName, String courseCode, String courseName) {
+        Map<String, Object> notification = new HashMap<>();
+        notification.put("lecturerId", lecturerId);
+        notification.put("title", "New Check-In: " + courseCode);
+        notification.put("message", studentName + " has just checked in.");
+        notification.put("timestamp", FieldValue.serverTimestamp());
+        notification.put("isRead", false);
+        
+        notification.put("sessionId", sessionId);
+        notification.put("courseId", courseId);
+        notification.put("courseCode", courseCode);
+        notification.put("courseName", courseName);
+        notification.put("type", "check_in");
+
+        db.collection("notifications")
+                .add(notification)
+                .addOnSuccessListener(documentReference -> {
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Notification", "Failed to create notification trigger", e);
+                });
+    }
+
     private void saveAttendance(String attendanceDocId, String studentUserId, String studentName, String studentId, String selfieUrl) {
         Map<String, Object> attendance = new HashMap<>();
 
@@ -235,6 +274,7 @@ public class SelfieActivity extends AppCompatActivity {
                 .set(attendance)
                 .addOnSuccessListener(unused -> {
                     Toast.makeText(this, "Attendance submitted successfully", Toast.LENGTH_LONG).show();
+                    getLecturerIdAndNotify(studentName);
                     finish();
                 })
                 .addOnFailureListener(e -> {
